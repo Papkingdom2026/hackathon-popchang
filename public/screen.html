@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="th" class="h-full">
+<head>
+  <meta charset="UTF-8">
+  <title>Main Screen | Game Programming Hackathon 2026</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#010626">
+  
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  
+  <!-- Custom Neon Cyberpunk & Retro Styles -->
+  <link rel="stylesheet" href="css/style.css">
+
+  <style>
+    body {
+      background-color: #010626;
+      overflow: hidden;
+      height: 100vh;
+      width: 100vw;
+    }
+
+    /* Ambient cyber grid floor */
+    .cyber-grid-floor {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      height: 30vh;
+      background: linear-gradient(to top, rgba(0, 240, 255, 0.08) 0%, transparent 100%),
+                  linear-gradient(90deg, rgba(0, 240, 255, 0.05) 1px, transparent 1px),
+                  linear-gradient(0deg, rgba(0, 240, 255, 0.05) 1px, transparent 1px);
+      background-size: 100% 100%, 60px 60px, 60px 60px;
+      transform: perspective(500px) rotateX(60deg);
+      transform-origin: bottom center;
+      pointer-events: none;
+      z-index: 1;
+    }
+  </style>
+</head>
+<body id="screenBody" class="cyber-bg text-white flex flex-col justify-between p-4 lg:p-6 relative select-none">
+
+  <!-- Interactive Ambient Canvas & Floor Grid -->
+  <canvas id="ambientCanvas" class="absolute inset-0 pointer-events-none z-0"></canvas>
+  <div class="cyber-grid-floor"></div>
+
+  <!-- Confetti Canvas for 100% Grand Finale -->
+  <canvas id="confettiCanvas" class="fixed inset-0 pointer-events-none z-50 hidden"></canvas>
+
+  <!-- TOP MINIMAL STATUS HUD (NO PRE-REVEALED TITLE) -->
+  <header class="w-full flex items-center justify-between z-10 relative">
+    <div class="flex items-center gap-3">
+      <div class="w-3.5 h-3.5 rounded-full bg-[#00ff66] pulse-indicator"></div>
+      <div>
+        <div class="font-orbitron text-sm lg:text-base font-bold text-[#00f0ff] neon-glow-cyan tracking-wider">
+          LIVE ENERGY HARVEST CONDUIT
+        </div>
+        <p class="text-[11px] font-mono-tech tracking-wider text-gray-400">
+          LOCATION: <span class="text-[#ff9e1f] font-bold">@PCSHS_PHITSANULOK</span>
+        </p>
+      </div>
+    </div>
+
+    <!-- Right Controls: Audio Starter & Online Counter -->
+    <div class="flex items-center gap-3">
+      <!-- Discreet Start Audio Button -->
+      <button id="btnStartAudio" class="cyber-btn cyber-btn-yellow text-xs px-3.5 py-1.5 flex items-center gap-2">
+        <span id="audioIcon">🔇</span>
+        <span id="audioStatusText">START AUDIO / BGM</span>
+      </button>
+
+      <!-- Online Count Badge -->
+      <div class="cyber-panel px-3.5 py-1.5 flex items-center gap-2">
+        <span class="text-xs text-gray-400 font-mono-tech">ONLINE:</span>
+        <span id="screenOnlineUsers" class="font-orbitron text-lg font-bold text-[#00ff66]">1</span>
+      </div>
+
+      <!-- Toggle QR Code Button -->
+      <button id="btnToggleQR" class="cyber-btn text-xs px-3 py-1.5">
+        📱 QR CODE
+      </button>
+    </div>
+  </header>
+
+  <!-- CENTER STAGE: LIQUID WAVE FILL ARTWORK (REVEALS ARTWORK & FONTS GRADUALLY) -->
+  <main id="centerStage" class="flex-1 flex flex-col items-center justify-center relative z-10 my-1">
+    
+    <div class="relative flex flex-col items-center">
+      
+      <!-- Outer Radial Portal Aura -->
+      <div id="portalGlow" class="absolute inset-0 rounded-3xl bg-radial from-[#00f0ff]/20 via-[#1c75ff]/15 to-transparent blur-2xl transition-all duration-300 pointer-events-none"></div>
+
+      <!-- Liquid Wave Artwork Stage (576 x 1024 proportion) -->
+      <div id="artStage" class="liquid-art-stage relative">
+        
+        <!-- White Light Core Behind Parting Doors -->
+        <div id="doorWhiteLight" class="absolute inset-0 bg-white flex items-center justify-center opacity-0 rounded-2xl overflow-hidden z-20 pointer-events-none transition-opacity duration-700">
+          <div class="w-full h-full bg-radial from-white via-white/95 to-[#00f0ff]/40 shadow-[0_0_120px_#ffffff]"></div>
+        </div>
+
+        <!-- Door Split Stage (Clones the full banner into 2 sliding halves) -->
+        <div id="doorSplitStage" class="absolute inset-0 pointer-events-none hidden z-25 overflow-hidden rounded-2xl">
+          <!-- Left Half Door -->
+          <div id="doorLeft" class="door-panel-left absolute inset-y-0 left-0 w-1/2 overflow-hidden border-r-2 border-[#00f0ff] shadow-[0_0_20px_#00f0ff] bg-[#020926]">
+            <img src="/assets/hackathon_logo_wide.png" alt="" class="absolute top-0 left-0 max-w-none w-[200%] h-full object-contain pointer-events-none filter drop-shadow-[0_0_25px_rgba(0,240,255,0.85)] brightness-110">
+          </div>
+          <!-- Right Half Door -->
+          <div id="doorRight" class="door-panel-right absolute inset-y-0 right-0 w-1/2 overflow-hidden border-l-2 border-[#00f0ff] shadow-[0_0_20px_#00f0ff] bg-[#020926]">
+            <img src="/assets/hackathon_logo_wide.png" alt="" class="absolute top-0 right-0 max-w-none w-[200%] h-full object-contain pointer-events-none filter drop-shadow-[0_0_25px_rgba(0,240,255,0.85)] brightness-110">
+          </div>
+        </div>
+
+        <!-- 1. Background Dimmed Artwork Silhouette (Dark & Blurry until revealed) -->
+        <img id="screenLogoBase" 
+             src="/assets/hackathon_logo_wide.png" 
+             alt="Hackathon Banner Silhouette" 
+             class="art-base-layer">
+
+        <!-- 2. Rising Liquid Fill Container (Height: 0% -> 100%) -->
+        <div id="liquidWrapper" class="liquid-art-fill" style="height: 0%;">
+          
+          <!-- Animated Sine Wave Crests on Liquid Surface -->
+          <div class="liquid-wave-top"></div>
+          <div class="liquid-wave-sub"></div>
+
+          <!-- Rising Bubbles Inside Liquid -->
+          <div id="liquidBubbles" class="absolute inset-0 pointer-events-none overflow-hidden"></div>
+
+          <!-- 3. Fully Illuminated Glowing Artwork Inside Liquid (Reveals as liquid rises!) -->
+          <img id="screenLogoActive" 
+               src="/assets/hackathon_logo_wide.png" 
+               alt="Hackathon Banner Active" 
+               class="art-active-layer">
+        </div>
+
+        <!-- Floating Live Percentage Inside Artwork Stage -->
+        <div class="absolute bottom-3 left-0 right-0 text-center z-10 pointer-events-none">
+          <div class="inline-block px-5 py-1 rounded-full bg-black/80 border border-[#00f0ff]/50 backdrop-blur-md shadow-[0_0_20px_rgba(0,240,255,0.4)]">
+            <span id="centerPercentage" class="font-orbitron text-2xl lg:text-3xl font-black text-[#ffe600] neon-glow-yellow">
+              0.0%
+            </span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Real-time Energy Status Label -->
+      <div class="mt-2.5 text-center">
+        <span id="energyStatusSubtext" class="text-xs font-mono-tech tracking-wider text-[#00f0ff] uppercase px-4 py-1 rounded-full bg-[#00f0ff]/10 border border-[#00f0ff]/30">
+          ⚡ TRANSMITTING HACKER ENERGY... TAP TO CHARGE ⚡
+        </span>
+      </div>
+
+    </div>
+  </main>
+
+  <!-- BOTTOM STAGE: RETRO SEGMENTED BAR & TRANSFER RATE (NO TARGET NUMBERS REVEALED) -->
+  <footer id="bottomStage" class="w-full z-10 relative">
+    <div class="cyber-panel px-6 py-3">
+      
+      <!-- Stats Header Above Bar -->
+      <div class="flex items-center justify-between mb-1.5 font-mono-tech">
+        <div class="flex items-baseline gap-2">
+          <span class="text-xs text-gray-400">ENERGY STATUS:</span>
+          <span class="font-orbitron text-xl font-bold text-[#00f0ff]">
+            SYSTEM CHARGING
+          </span>
+        </div>
+
+        <div class="flex items-center gap-6 font-mono-tech">
+          <!-- CPS Transfer Rate -->
+          <div class="flex items-center gap-2">
+            <span class="text-xs text-gray-400">TRANSFER RATE:</span>
+            <span id="screenCPS" class="font-orbitron text-xl font-bold text-[#ffe600]">0</span>
+            <span class="text-xs text-gray-400">CLICKS/SEC</span>
+          </div>
+
+          <!-- Percentage -->
+          <div class="font-orbitron text-2xl lg:text-3xl font-black text-[#ffe600] neon-glow-yellow">
+            <span id="screenPercentage">0.0</span>%
+          </div>
+        </div>
+      </div>
+
+      <!-- Retro Segmented Progress Bar (36 segments on projector screen) -->
+      <div id="screenRetroBar" class="retro-segmented-container !h-7 mb-1.5">
+        <!-- Segments dynamically rendered via JS -->
+      </div>
+
+      <!-- Milestone markers -->
+      <div class="flex justify-between items-center text-[10px] font-mono-tech text-gray-400 px-1">
+        <span>0% [STANDBY]</span>
+        <span>25% [SYNCHRONIZED]</span>
+        <span>50% [HALF CAPACITY]</span>
+        <span>75% [OVERCLOCKING]</span>
+        <span class="text-[#ffe600] font-bold">100% [GAME START!]</span>
+      </div>
+    </div>
+  </footer>
+
+  <!-- FLOATING QR CODE CARD (TOGGLEABLE) -->
+  <div id="qrModal" class="absolute top-16 right-6 z-40 cyber-panel p-4 flex flex-col items-center gap-2.5 bg-[#01082d]/95 transition-all duration-300">
+    <div class="text-xs font-orbitron font-bold text-[#00f0ff] tracking-wider">
+      📱 SCAN TO JOIN HACKATHON
+    </div>
+    <div class="bg-white p-2 rounded-xl border-2 border-[#00f0ff] shadow-[0_0_20px_rgba(0,240,255,0.4)]">
+      <img id="qrImg" src="" alt="QR Code" class="w-36 h-36 object-contain">
+    </div>
+    <div class="text-center font-mono-tech text-xs text-gray-200">
+      <span id="qrUrlText" class="text-[#ffe600] font-semibold break-all">http://...</span>
+    </div>
+    <button onclick="document.getElementById('qrModal').classList.add('hidden')" class="text-[10px] text-gray-400 hover:text-white underline">
+      [ซ่อน QR Code]
+    </button>
+  </div>
+
+  <!-- GAME START FULLSCREEN GRAND FINALE OVERLAY (100% REACHED) -->
+  <div id="gameStartOverlay" class="fixed inset-0 z-50 flex flex-col items-center justify-center bg-[#010626]/95 pointer-events-none hidden transition-opacity duration-500">
+    <div id="flashEffect"></div>
+
+    <div class="text-center p-6 transform scale-90 transition-transform duration-700">
+      <div class="inline-block px-6 py-2 rounded-full bg-[#ff9e1f]/20 border-2 border-[#ff9e1f] font-orbitron text-sm font-bold text-[#ffe600] tracking-widest mb-6 animate-pulse">
+        ✦ CEREMONY UNLOCKED ✦ PCSHS PHITSANULOK ✦
+      </div>
+
+      <h1 class="game-start-title mb-4">
+        GAME START!
+      </h1>
+
+      <p class="font-orbitron text-xl sm:text-2xl lg:text-3xl font-bold text-[#00f0ff] neon-glow-cyan tracking-wider mb-8">
+        GAME PROGRAMMING HACKATHON 2026 IS OFFICIALLY OPEN!
+      </p>
+
+      <div class="flex items-center justify-center gap-8 font-mono-tech text-base">
+        <div class="cyber-panel px-6 py-3">
+          <div class="text-xs text-gray-400">STATUS</div>
+          <div class="text-2xl font-orbitron font-bold text-[#ffe600]">MISSION UNLOCKED</div>
+        </div>
+        <div class="cyber-panel px-6 py-3">
+          <div class="text-xs text-gray-400">CLEAR TIME</div>
+          <div id="finalDuration" class="text-2xl font-orbitron font-bold text-[#00ff66]">-- s</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- FULLSCREEN PURE WHITEOUT OVERLAY (10 Seconds Cinematic Hold) -->
+  <div id="whiteOutOverlay" class="fixed inset-0 bg-white z-[99999] pointer-events-none opacity-0 transition-opacity duration-1000 flex items-center justify-center">
+    <div class="font-orbitron font-bold text-gray-300/40 text-xs tracking-widest uppercase select-none">
+      ✦ SYSTEM INITIALIZED ✦
+    </div>
+  </div>
+
+  <!-- Socket.IO & Logic Scripts -->
+  <script src="/socket.io/socket.io.js"></script>
+  <script src="js/audio.js"></script>
+  <script src="js/screen.js"></script>
+</body>
+</html>

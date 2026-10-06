@@ -1,0 +1,540 @@
+/* Cyberpunk & Retro Minimal Theme - Game Programming Hackathon 2026 @PCSHS_PHITSANULOK */
+@import url('https://fonts.googleapis.com/css2?family=Chakra+Petch:ital,wght@0,400;0,600;0,700;1,700&family=Orbitron:wght@500;700;900&family=Share+Tech+Mono&display=swap');
+
+:root {
+  --neon-cyan: #00f0ff;
+  --neon-blue: #1c75ff;
+  --neon-pink: #ff007f;
+  --neon-yellow: #ffe600;
+  --neon-orange: #ff9e1f;
+  --neon-green: #00ff66;
+  --bg-deep-blue: #010626;
+  --bg-gradient: radial-gradient(circle at 50% 35%, #051859 0%, #01082d 65%, #00041a 100%);
+  --bg-card: rgba(2, 10, 38, 0.85);
+  --border-neon: rgba(0, 240, 255, 0.35);
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: 'Chakra Petch', sans-serif;
+  background-color: var(--bg-deep-blue);
+  background: var(--bg-gradient);
+  background-attachment: fixed;
+  color: #ffffff;
+  overflow: hidden;
+  min-height: 100vh;
+}
+
+.font-orbitron {
+  font-family: 'Orbitron', monospace, sans-serif;
+}
+
+.font-mono-tech {
+  font-family: 'Share Tech Mono', monospace;
+}
+
+/* Neon Glows */
+.neon-glow-cyan {
+  text-shadow: 0 0 10px rgba(0, 240, 255, 0.8), 0 0 25px rgba(0, 240, 255, 0.5);
+}
+
+.neon-glow-yellow {
+  text-shadow: 0 0 10px rgba(255, 230, 0, 0.8), 0 0 25px rgba(255, 158, 31, 0.6);
+}
+
+/* Cyber Card Panels */
+.cyber-panel {
+  background: var(--bg-card);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  border: 1px solid var(--border-neon);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.6), 0 0 15px rgba(0, 240, 255, 0.15);
+  border-radius: 12px;
+  position: relative;
+}
+
+/* Pulsing Badge */
+.pulse-indicator {
+  animation: pulseBeacon 1.8s infinite;
+}
+
+@keyframes pulseBeacon {
+  0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(0, 255, 102, 0.7); }
+  70% { transform: scale(1.1); box-shadow: 0 0 0 8px rgba(0, 255, 102, 0); }
+  100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(0, 255, 102, 0); }
+}
+
+/* Background Flash Reaction on Tap */
+.tap-energy-flash {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  background: radial-gradient(circle at 50% 60%, rgba(0, 240, 255, 0.22) 0%, rgba(28, 117, 255, 0.1) 45%, transparent 70%);
+  opacity: 0;
+  transition: opacity 0.08s ease;
+  z-index: 2;
+}
+
+.tap-energy-flash.active {
+  opacity: 1;
+}
+
+/* =========================================================================
+ * RETRO SEGMENTED PROGRESS BAR
+ * ========================================================================= */
+.retro-segmented-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 3px;
+  padding: 4px 6px;
+  background: rgba(0, 5, 20, 0.85);
+  border: 2px solid #ff9e1f;
+  border-radius: 4px;
+  box-shadow: 0 0 12px rgba(255, 158, 31, 0.4), inset 0 0 6px rgba(0, 0, 0, 0.8);
+  width: 100%;
+}
+
+.retro-segment {
+  flex: 1;
+  height: 12px;
+  min-width: 5px;
+  background: rgba(255, 158, 31, 0.15);
+  border: 1px solid rgba(255, 158, 31, 0.35);
+  border-radius: 1px;
+  transition: all 0.15s ease;
+}
+
+.retro-segment.active {
+  background: linear-gradient(180deg, #ffe600 0%, #ff9e1f 100%);
+  border-color: #ffffff;
+  box-shadow: 0 0 8px #ff9e1f, 0 0 14px rgba(255, 230, 0, 0.7);
+}
+
+/* =========================================================================
+ * MINIMALIST POPCAT MASCOT (CLEAN TRANSPARENT PNG)
+ * ========================================================================= */
+.mascot-touch-box {
+  position: relative;
+  width: min(88vw, 440px);
+  height: min(88vw, 440px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+.mascot-img-layer {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  pointer-events: none;
+  transition: transform 0.05s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  filter: drop-shadow(0 15px 35px rgba(0, 240, 255, 0.45));
+}
+
+.mascot-touch-box:active .mascot-img-layer,
+.mascot-touch-box.active-tap .mascot-img-layer {
+  transform: scale(0.93);
+}
+
+/* Floating Click Feedback Numbers (+1) */
+.floating-particle {
+  position: absolute;
+  pointer-events: none;
+  font-family: 'Orbitron', monospace;
+  font-weight: 900;
+  font-size: 2.2rem;
+  color: #ffe600;
+  text-shadow: 0 0 10px #ffe600, 0 0 25px #ff9e1f;
+  animation: floatFadeOut 0.75s cubic-bezier(0.1, 0.9, 0.2, 1) forwards;
+  z-index: 100;
+}
+
+@keyframes floatFadeOut {
+  0% {
+    transform: translate(-50%, -50%) scale(0.6) rotate(0deg);
+    opacity: 1;
+  }
+  50% {
+    transform: translate(-50%, -90px) scale(1.35) rotate(-6deg);
+    opacity: 0.95;
+  }
+  100% {
+    transform: translate(-50%, -150px) scale(1.1) rotate(8deg);
+    opacity: 0;
+  }
+}
+
+/* Water Droplet Shooting From Elephant Trunk */
+.water-drop {
+  position: absolute;
+  pointer-events: none;
+  width: 14px;
+  height: 20px;
+  background: radial-gradient(circle at 35% 30%, #ffffff 0%, #00f0ff 45%, #0066ff 100%);
+  border-radius: 50% 50% 50% 50% / 60% 60% 40% 40%;
+  box-shadow: 0 0 10px #00f0ff, 0 0 20px rgba(0, 240, 255, 0.85);
+  z-index: 75;
+  transform-origin: center center;
+}
+
+.splash-spark {
+  position: absolute;
+  pointer-events: none;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #ffffff;
+  box-shadow: 0 0 8px #00f0ff;
+  z-index: 74;
+}
+
+/* Ripple Shockwave Ring on Tap */
+.shockwave-ring {
+  position: absolute;
+  border: 3px solid var(--neon-cyan);
+  border-radius: 50%;
+  pointer-events: none;
+  animation: shockwave 0.5s ease-out forwards;
+  z-index: 50;
+}
+
+@keyframes shockwave {
+  0% {
+    width: 20px;
+    height: 20px;
+    transform: translate(-50%, -50%) scale(1);
+    opacity: 1;
+    box-shadow: 0 0 15px var(--neon-cyan);
+  }
+  100% {
+    width: 240px;
+    height: 240px;
+    transform: translate(-50%, -50%) scale(1);
+    opacity: 0;
+    box-shadow: 0 0 35px var(--neon-cyan);
+  }
+}
+
+/* =========================================================================
+ * LIQUID WAVE FILL FOR PROJECTOR SCREEN (WIDE 1024x491 BANNER STAGE)
+ * ========================================================================= */
+:root {
+  --stage-width: 1040px;
+  --stage-height: 480px;
+}
+
+@media (max-height: 900px) {
+  :root {
+    --stage-width: 920px;
+    --stage-height: 420px;
+  }
+}
+
+@media (max-width: 1100px) {
+  :root {
+    --stage-width: 92vw;
+    --stage-height: 44vw;
+  }
+}
+
+.liquid-art-stage {
+  position: relative;
+  width: var(--stage-width);
+  max-width: 94vw;
+  height: var(--stage-height);
+  max-height: 56vh;
+  margin: 0 auto;
+  border-radius: 24px;
+  overflow: hidden;
+  box-shadow: 0 0 50px rgba(0, 240, 255, 0.35), inset 0 0 40px rgba(0, 0, 0, 0.85);
+  border: 2px solid rgba(0, 240, 255, 0.5);
+  background: radial-gradient(ellipse at 50% 60%, #031548 0%, #010826 100%);
+}
+
+/* Base unrevealed layer: Dark & Blurry silhouette (People cannot recognize or read yet) */
+.art-base-layer {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  opacity: 0.20;
+  filter: blur(10px) brightness(0.22) contrast(0.65) grayscale(95%);
+  pointer-events: none;
+  z-index: 1;
+}
+
+.liquid-art-fill {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  width: 100%;
+  height: 0%; /* Dynamically controlled by JS: 0% to 100% */
+  overflow: hidden;
+  transition: height 0.22s cubic-bezier(0.2, 0.8, 0.2, 1);
+  z-index: 2;
+  background: linear-gradient(180deg, rgba(0, 240, 255, 0.32) 0%, rgba(1, 13, 58, 0.7) 100%);
+}
+
+/* Active illuminated layer: Pinned to stage bottom, 100% sharp, bright, and vibrant */
+.art-active-layer {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: var(--stage-height);
+  object-fit: contain;
+  filter: drop-shadow(0 0 25px rgba(0, 240, 255, 0.85)) brightness(1.15) contrast(1.05);
+  pointer-events: none;
+}
+
+/* Animated Sine Waves at fluid surface */
+.liquid-wave-top, .liquid-wave-sub {
+  position: absolute;
+  top: -24px;
+  left: 0;
+  width: 200%;
+  height: 28px;
+  pointer-events: none;
+}
+
+.liquid-wave-top {
+  background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 800 50' preserveAspectRatio='none'%3E%3Cpath d='M0,25 C150,50 350,0 500,25 C650,50 850,0 1000,25 L1000,50 L0,50 Z' fill='%2300f0ff' opacity='0.75'/%3E%3C/svg%3E");
+  background-size: 50% 100%;
+  animation: waveFlow 3.2s linear infinite;
+  filter: drop-shadow(0 -3px 8px #00f0ff);
+}
+
+.liquid-wave-sub {
+  top: -18px;
+  background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 800 50' preserveAspectRatio='none'%3E%3Cpath d='M0,25 C200,0 300,50 500,25 C700,0 800,50 1000,25 L1000,50 L0,50 Z' fill='%231c75ff' opacity='0.55'/%3E%3C/svg%3E");
+  background-size: 50% 100%;
+  animation: waveFlowRev 4.5s linear infinite;
+}
+
+@keyframes waveFlow {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
+}
+
+@keyframes waveFlowRev {
+  0% { transform: translateX(-50%); }
+  100% { transform: translateX(0); }
+}
+
+/* Rising Bubbles */
+.bubble {
+  position: absolute;
+  bottom: 0;
+  background: rgba(0, 240, 255, 0.75);
+  border-radius: 50%;
+  box-shadow: 0 0 10px #00f0ff;
+  animation: riseBubble linear infinite;
+}
+
+@keyframes riseBubble {
+  0% { transform: translateY(0) scale(0.6); opacity: 0; }
+  20% { opacity: 0.85; }
+  90% { opacity: 0.85; }
+  100% { transform: translateY(-500px) scale(1.4); opacity: 0; }
+}
+
+/* =========================================================================
+ * CELEBRATION EFFECTS
+ * ========================================================================= */
+.screen-shake {
+  animation: shakeViewport 0.8s cubic-bezier(0.36, 0.07, 0.19, 0.97) both;
+}
+
+@keyframes shakeViewport {
+  10%, 90% { transform: translate3d(-3px, -2px, 0); }
+  20%, 80% { transform: translate3d(4px, 3px, 0); }
+  30%, 50%, 70% { transform: translate3d(-6px, -4px, 0); }
+  40%, 60% { transform: translate3d(6px, 4px, 0); }
+}
+
+.flash-overlay {
+  position: fixed;
+  inset: 0;
+  background: #ffffff;
+  pointer-events: none;
+  z-index: 9998;
+  animation: whiteFlash 1.2s ease-out forwards;
+}
+
+@keyframes whiteFlash {
+  0% { opacity: 0.95; }
+  100% { opacity: 0; }
+}
+
+.game-start-title {
+  font-family: 'Orbitron', monospace;
+  font-size: clamp(3.5rem, 9vw, 7.5rem);
+  font-weight: 900;
+  letter-spacing: 0.15em;
+  color: #ffffff;
+  text-shadow: 
+    0 0 10px #ffe600,
+    0 0 25px #ff9e1f,
+    0 0 50px #ff007f,
+    0 0 90px #00f0ff;
+  animation: neonGlitchPulse 1.2s ease-in-out infinite alternate;
+}
+
+@keyframes neonGlitchPulse {
+  0% {
+    transform: scale(1);
+    filter: drop-shadow(0 0 20px #ff9e1f);
+  }
+  100% {
+    transform: scale(1.05);
+    filter: drop-shadow(0 0 45px #00f0ff) drop-shadow(0 0 70px #ffe600);
+  }
+}
+
+/* Cyber Button */
+.cyber-btn {
+  font-family: 'Orbitron', sans-serif;
+  letter-spacing: 0.05em;
+  position: relative;
+  background: rgba(0, 240, 255, 0.12);
+  border: 1px solid var(--neon-cyan);
+  color: var(--neon-cyan);
+  padding: 8px 18px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  overflow: hidden;
+}
+
+.cyber-btn:hover {
+  background: var(--neon-cyan);
+  color: #000000;
+  box-shadow: 0 0 25px rgba(0, 240, 255, 0.7);
+}
+
+.cyber-btn-yellow {
+  border-color: var(--neon-yellow);
+  color: var(--neon-yellow);
+  background: rgba(255, 230, 0, 0.12);
+}
+
+.cyber-btn-pink {
+  border-color: var(--neon-pink);
+  color: var(--neon-pink);
+  background: rgba(255, 0, 127, 0.12);
+}
+
+/* =========================================================================
+ * Mobile High-Performance Mode (Fast 60FPS Touch & Zero Glow Overhead)
+ * ========================================================================= */
+.mascot-touch-box {
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+  user-select: none;
+  -webkit-user-select: none;
+  will-change: transform;
+}
+
+/* Water Droplet (Lightweight without expensive drop-shadow filters) */
+.water-drop {
+  position: fixed;
+  pointer-events: none;
+  z-index: 9999;
+  width: 18px;
+  height: 25px;
+  transform-origin: center center;
+  will-change: transform, left, top;
+}
+
+.water-drop svg {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+/* Water Splash Spark */
+.splash-spark {
+  position: fixed;
+  pointer-events: none;
+  z-index: 9998;
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: #38bdf8;
+  will-change: transform, left, top;
+}
+
+/* Screen Charging Vibration for Climax Overdrive */
+@keyframes chargingTremor {
+  0% { transform: translate(0, 0) scale(1); filter: drop-shadow(0 0 12px rgba(0, 240, 255, 0.5)); }
+  25% { transform: translate(-2px, 1.5px) scale(1.003); filter: drop-shadow(0 0 22px rgba(255, 230, 0, 0.65)); }
+  50% { transform: translate(2px, -1.5px) scale(1.005); filter: drop-shadow(0 0 32px rgba(255, 0, 127, 0.75)); }
+  75% { transform: translate(-1.5px, 2px) scale(1.007); filter: drop-shadow(0 0 42px rgba(0, 240, 255, 0.9)); }
+  100% { transform: translate(1.5px, -2px) scale(1.009); filter: drop-shadow(0 0 55px rgba(255, 230, 0, 1)); }
+}
+
+.charging-vibration {
+  animation: chargingTremor 0.07s infinite alternate !important;
+}
+
+/* =========================================================================
+ * SCI-FI DOOR SPLIT & CINEMATIC WHITEOUT TRANSITION
+ * ========================================================================= */
+.door-panel-left {
+  transition: transform 1.5s cubic-bezier(0.16, 1, 0.3, 1);
+  will-change: transform;
+}
+
+.door-panel-right {
+  transition: transform 1.5s cubic-bezier(0.16, 1, 0.3, 1);
+  will-change: transform;
+}
+
+.door-open-active #doorLeft {
+  transform: translateX(-102%) perspective(800px) rotateY(-12deg);
+}
+
+.door-open-active #doorRight {
+  transform: translateX(102%) perspective(800px) rotateY(12deg);
+}
+
+.door-white-flare {
+  opacity: 1 !important;
+  animation: whiteFlareBloom 1.5s ease-out forwards;
+}
+
+@keyframes whiteFlareBloom {
+  0% {
+    opacity: 0.2;
+    transform: scale(0.8);
+  }
+  40% {
+    opacity: 0.9;
+    transform: scale(1.1);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1.6);
+  }
+}
+
+.whiteout-visible {
+  opacity: 1 !important;
+  pointer-events: auto !important;
+}
+

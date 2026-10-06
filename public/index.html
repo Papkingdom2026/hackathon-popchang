@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="th" class="h-full">
+<head>
+  <meta charset="UTF-8">
+  <title>Hackathon 2026</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <meta name="theme-color" content="#010626">
+  
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  
+  <!-- Custom Neon Cyberpunk & Retro Styles -->
+  <link rel="stylesheet" href="css/style.css">
+
+  <style>
+    /* Prevent all zooming, selecting, dragging, and bouncing on mobile */
+    html, body {
+      touch-action: manipulation;
+      user-select: none;
+      -webkit-user-select: none;
+      -webkit-touch-callout: none;
+      overflow: hidden;
+      height: 100%;
+      width: 100%;
+      position: fixed;
+    }
+  </style>
+</head>
+<body class="cyber-bg text-white flex flex-col justify-between items-center select-none">
+
+  <!-- Ambient Game Dev / Coding Particles Canvas -->
+  <canvas id="codeBgCanvas" class="fixed inset-0 pointer-events-none z-0"></canvas>
+  
+  <!-- Radiant Energy Flash on Tap -->
+  <div id="tapEnergyFlash" class="tap-energy-flash"></div>
+
+  <!-- TOP HUD: STATS & ENERGY CONDUIT BAR (MOVED TO TOP AS REQUESTED) -->
+  <header class="w-full pt-3 px-4 z-20 max-w-md">
+    
+    <!-- Top Stats Row -->
+    <div class="flex items-center justify-between font-mono-tech text-xs mb-2">
+      <!-- Online Beacon -->
+      <div class="flex items-center gap-1.5">
+        <span class="w-2 h-2 rounded-full bg-[#00ff66] pulse-indicator"></span>
+        <span class="text-gray-300">ONLINE: <span id="onlineCount" class="text-[#00ff66] font-bold">1</span></span>
+      </div>
+
+      <!-- Personal Clicks Counter (Prominent) -->
+      <div class="flex items-center gap-1.5 px-3 py-1 rounded-full bg-black/50 border border-[#00f0ff]/30 shadow-[0_0_15px_rgba(0,240,255,0.25)]">
+        <span class="text-[#ffe600] font-bold text-xs">⚡ พลังที่คุณส่ง:</span>
+        <span class="font-orbitron font-black text-lg text-[#ffe600] neon-glow-yellow">
+          <span id="myClicks">0</span>
+        </span>
+      </div>
+
+      <!-- Sound Toggle -->
+      <button id="btnAudioToggle" class="bg-black/50 hover:bg-black/70 text-[#00f0ff] px-2.5 py-1 rounded border border-[#00f0ff]/30 text-[11px] transition">
+        🔊
+      </button>
+    </div>
+
+    <!-- Retro Segmented Energy Conduit Bar (Target 2026 is kept secret!) -->
+    <div class="w-full">
+      <div id="retroBar" class="retro-segmented-container">
+        <!-- 24 Retro Segments -->
+      </div>
+      <div class="flex justify-between items-center text-[10px] font-mono-tech text-gray-400 mt-1 px-1">
+        <span class="text-[#00f0ff] font-bold tracking-wider">ENERGY CONDUIT</span>
+        <span class="flex items-center gap-2">
+          <span id="myCPSText" class="text-gray-300"><span id="myCPS" class="text-[#00f0ff] font-bold">0</span> /s</span>
+          <span id="headerPercent" class="text-[#ffe600] font-bold">0.0%</span>
+        </span>
+      </div>
+    </div>
+
+  </header>
+
+  <!-- CENTER STAGE: ELEPHANT MASCOT ON TABLET (CLEAN MINIMAL, NO TEXT) -->
+  <main class="flex-1 flex flex-col items-center justify-center relative w-full px-4 z-10">
+    <!-- Fast 60FPS Canvas Overlay for Water Spray & Taps (Zero DOM overhead) -->
+    <canvas id="waterCanvas" class="fixed inset-0 pointer-events-none z-40"></canvas>
+
+    <!-- Click Particle Container -->
+    <div id="particleContainer" class="absolute inset-0 pointer-events-none overflow-hidden z-30"></div>
+
+    <!-- Interactive Mascot Touch Box -->
+    <div id="tapArea" class="mascot-touch-box">
+      <!-- Mascot Closed Mouth (Transparent PNG, No Background) -->
+      <img id="imgClosed" 
+           src="assets/mascot_closed.png" 
+           alt="Mascot Closed" 
+           class="mascot-img-layer"
+           onerror="this.onerror=null; this.src='assets/mascot_closed.jpg'">
+
+      <!-- Mascot Open Mouth (Transparent PNG, Exactly Identical Size & Alignment) -->
+      <img id="imgOpen" 
+           src="assets/mascot_open.png" 
+           alt="Mascot Open" 
+           class="mascot-img-layer hidden"
+           onerror="this.onerror=null; this.src='assets/mascot_open.jpg'">
+    </div>
+  </main>
+
+  <!-- BOTTOM HINT (MINIMAL) -->
+  <footer class="w-full pb-4 text-center z-10">
+    <div class="inline-block px-4 py-1 rounded-full bg-black/40 border border-[#00f0ff]/20 text-[11px] font-mono-tech text-gray-300">
+      ⚡ แตะที่ช้างรัวๆ เพื่อส่งพลังงาน ⚡
+    </div>
+  </footer>
+
+  <!-- CELEBRATION MODAL ON GAME START -->
+  <div id="gameStartModal" class="fixed inset-0 bg-[#010626]/95 z-50 flex flex-col items-center justify-center p-6 text-center hidden">
+    <div class="text-6xl mb-3 animate-bounce">🚀</div>
+    <div class="font-orbitron text-4xl sm:text-5xl font-black text-[#ffe600] neon-glow-yellow mb-2">
+      GAME START!
+    </div>
+    <p class="text-[#00f0ff] font-bold text-lg mb-2">
+      ปลดล็อกพิธีเปิดสำเร็จแล้ว!
+    </p>
+    <div class="cyber-panel px-6 py-4 my-4">
+      <div class="text-xs text-gray-400">คุณมีส่วนร่วมส่งพลังไปทั้งหมด</div>
+      <div class="text-3xl font-orbitron font-bold text-[#00ff66] mt-1">
+        <span id="modalFinalClicks">0</span> ครั้ง!
+      </div>
+    </div>
+    <button onclick="document.getElementById('gameStartModal').classList.add('hidden')" class="cyber-btn text-sm">
+      ดูหน้าจอต่อ
+    </button>
+  </div>
+
+  <!-- Socket.IO & Logic Scripts -->
+  <script src="/socket.io/socket.io.js"></script>
+  <script src="js/audio.js"></script>
+  <script src="js/player.js"></script>
+</body>
+</html>

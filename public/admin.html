@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html lang="th" class="h-full">
+<head>
+  <meta charset="UTF-8">
+  <title>Admin Mission Control | Game Programming Hackathon 2026</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#010626">
+  
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  
+  <!-- Custom Neon Cyberpunk & Retro Styles -->
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body class="cyber-bg text-white min-h-screen p-4 md:p-6">
+
+  <div class="max-w-6xl mx-auto space-y-5">
+
+    <!-- HEADER -->
+    <header class="cyber-panel px-6 py-4 flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+      <div class="flex items-center gap-3">
+        <span class="w-3.5 h-3.5 rounded-full bg-[#ffe600] pulse-indicator"></span>
+        <div>
+          <h1 class="font-orbitron text-xl md:text-2xl font-black text-[#ffe600] neon-glow-yellow">
+            ADMIN MISSION CONTROL
+          </h1>
+          <p class="text-xs font-mono-tech text-gray-300">
+            REAL-TIME CEREMONY PACING & LIVE CONTROLLER // @PCSHS_PHITSANULOK
+          </p>
+        </div>
+      </div>
+
+      <!-- Quick View Links -->
+      <div class="flex items-center gap-3 text-xs">
+        <a href="/screen.html" target="_blank" class="cyber-btn flex items-center gap-1.5 py-1.5 px-3">
+          🖥️ จอใหญ่ (Screen View)
+        </a>
+        <a href="/index.html" target="_blank" class="cyber-btn cyber-btn-pink flex items-center gap-1.5 py-1.5 px-3">
+          📱 จอมือถือ (Player View)
+        </a>
+      </div>
+    </header>
+
+    <!-- METRICS CARDS ROW (5 CARDS) -->
+    <div class="grid grid-cols-2 md:grid-cols-5 gap-3.5">
+      
+      <!-- Card 1: Online Users -->
+      <div class="cyber-panel p-3.5">
+        <div class="text-[11px] text-gray-400 font-mono-tech flex items-center justify-between">
+          <span>ONLINE AGENTS</span>
+          <span class="w-2 h-2 rounded-full bg-[#00ff66]"></span>
+        </div>
+        <div class="text-2xl font-orbitron font-bold text-[#00ff66] mt-1.5">
+          <span id="adminOnlineUsers">0</span>
+        </div>
+        <div class="text-[10px] text-gray-400 mt-0.5">ผู้เล่นที่ต่ออยู่ขณะนี้</div>
+      </div>
+
+      <!-- Card 2: Energy Points -->
+      <div class="cyber-panel p-3.5">
+        <div class="text-[11px] text-gray-400 font-mono-tech">ENERGY POINTS</div>
+        <div class="text-2xl font-orbitron font-bold text-[#00f0ff] neon-glow-cyan mt-1.5">
+          <span id="adminClicks">0</span>
+        </div>
+        <div class="text-[10px] text-gray-400 mt-0.5">
+          เป้าหมาย: <span id="adminTargetDisplay" class="text-white font-bold">2,026</span>
+        </div>
+      </div>
+
+      <!-- Card 3: Raw Finger Taps -->
+      <div class="cyber-panel p-3.5">
+        <div class="text-[11px] text-gray-400 font-mono-tech">RAW FINGER TAPS</div>
+        <div class="text-2xl font-orbitron font-bold text-[#ffe600] mt-1.5">
+          <span id="adminRawClicks">0</span>
+        </div>
+        <div class="text-[10px] text-gray-400 mt-0.5">ยอดกดนิ้วจริงทั้งหมด</div>
+      </div>
+
+      <!-- Card 4: Completion % -->
+      <div class="cyber-panel p-3.5">
+        <div class="text-[11px] text-gray-400 font-mono-tech">CAPACITY (%)</div>
+        <div class="text-2xl font-orbitron font-bold text-[#ff9e1f] mt-1.5">
+          <span id="adminPercentage">0.0</span>%
+        </div>
+        <div class="text-[10px] text-gray-400 mt-0.5">ความคืบหน้าของหลอด</div>
+      </div>
+
+      <!-- Card 5: Estimated Time Left (ETA) -->
+      <div class="cyber-panel p-3.5 col-span-2 md:col-span-1">
+        <div class="text-[11px] text-gray-400 font-mono-tech">ESTIMATED ETA</div>
+        <div id="adminETA" class="text-xl font-orbitron font-bold text-[#00f0ff] mt-1.5">
+          -- s
+        </div>
+        <div class="text-[10px] text-gray-400 mt-0.5">เวลาคงเหลือโดยประมาณ</div>
+      </div>
+
+    </div>
+
+    <!-- LIVE PROGRESS BAR PREVIEW -->
+    <div class="cyber-panel p-4 space-y-1.5">
+      <div class="flex justify-between items-center text-xs font-mono-tech">
+        <span class="text-gray-300">LIVE CONDUIT STATUS</span>
+        <span id="adminStatusText" class="px-2.5 py-0.5 rounded text-[11px] font-bold bg-[#00ff66]/10 text-[#00ff66] border border-[#00ff66]/30">
+          WAITING FOR PLAYERS
+        </span>
+      </div>
+      <div class="energy-bar-track !h-6">
+        <div id="adminProgressFill" class="energy-bar-fill" style="width: 0%;"></div>
+      </div>
+    </div>
+
+    <!-- MAIN CONTROL GRID -->
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+
+      <!-- SECTION 1: REAL-TIME PACING & DIFFICULTY (พารามิเตอร์คุมความเร็วแบบสดๆ) -->
+      <div class="cyber-panel p-5 space-y-4">
+        <div class="flex items-center justify-between">
+          <h2 class="font-orbitron text-base font-bold text-[#ffe600] flex items-center gap-2">
+            ⏱️ CEREMONY PACING (ปรับความเร็วเกมสด)
+          </h2>
+          <span id="badgeMultiplier" class="px-2.5 py-0.5 rounded text-xs font-bold font-mono-tech bg-[#ffe600]/20 text-[#ffe600] border border-[#ffe600]/50">
+            1.0x (ปกติ)
+          </span>
+        </div>
+
+        <p class="text-xs text-gray-300">
+          หากคนเยอะ 100+ คนแล้วหลอดขึ้นเร็วเกินไป ปรับลดอัตราทดที่นี่เพื่อให้การกดสูสีกับเวลาบนเวที:
+        </p>
+
+        <!-- Quick Multiplier Presets -->
+        <div class="grid grid-cols-4 gap-2 text-xs">
+          <button data-mult="0.2" class="btn-preset-mult cyber-btn !py-2 !px-1 text-center font-bold">
+            🐢 0.2x<br><span class="text-[9px] font-normal text-gray-300">สำหรับ 100+ คน</span>
+          </button>
+          <button data-mult="0.5" class="btn-preset-mult cyber-btn !py-2 !px-1 text-center font-bold">
+            ⚖️ 0.5x<br><span class="text-[9px] font-normal text-gray-300">ปานกลาง (~1 นาที)</span>
+          </button>
+          <button data-mult="1.0" class="btn-preset-mult cyber-btn !py-2 !px-1 text-center font-bold bg-[#00f0ff]/20 border-[#00f0ff]">
+            ⚡ 1.0x<br><span class="text-[9px] font-normal text-gray-300">ปกติ (1:1)</span>
+          </button>
+          <button data-mult="2.0" class="btn-preset-mult cyber-btn cyber-btn-yellow !py-2 !px-1 text-center font-bold">
+            🚀 2.0x<br><span class="text-[9px] font-normal text-gray-300">เร่งจบไว</span>
+          </button>
+        </div>
+
+        <!-- Multiplier Slider -->
+        <div class="bg-black/40 rounded-xl p-3 border border-[#00f0ff]/20 space-y-2">
+          <div class="flex justify-between items-center text-xs font-mono-tech">
+            <span class="text-gray-300">Custom Multiplier Slider:</span>
+            <span id="sliderValueText" class="text-[#ffe600] font-bold text-sm">1.00x</span>
+          </div>
+          <input id="sliderMultiplier" type="range" min="0.05" max="3.0" step="0.05" value="1.0" class="w-full accent-[#00f0ff] cursor-pointer">
+          <div class="flex justify-between text-[10px] font-mono-tech text-gray-400">
+            <span>0.05x (ช้ามาก)</span>
+            <span>1.0x</span>
+            <span>3.0x (เร็วมาก)</span>
+          </div>
+          <div id="multiplierHelpText" class="text-[11px] text-[#00f0ff] font-mono-tech pt-1">
+            💡 กดนิ้ว 10 ครั้ง = ได้ 10 แต้มพลังงาน
+          </div>
+        </div>
+
+        <!-- Target Clicks Configuration -->
+        <div class="border-t border-[#00f0ff]/20 pt-3 space-y-2.5">
+          <div class="flex items-center justify-between">
+            <label class="text-xs text-gray-300 font-mono-tech block">🎯 เป้าหมายพลังงาน (Target Clicks):</label>
+            <span class="text-[11px] text-[#00f0ff] font-mono-tech">เป้าหมายปัจจุบัน: <strong id="adminCurrentTargetVal" class="text-[#ffe600]">2,026</strong></span>
+          </div>
+
+          <!-- Preset Target Buttons -->
+          <div class="flex flex-wrap gap-1.5 text-xs font-mono-tech">
+            <button data-target="2026" class="btn-preset-target cyber-btn text-xs py-1 px-2.5">2,026 (พิธีเปิด)</button>
+            <button data-target="5000" class="btn-preset-target cyber-btn text-xs py-1 px-2.5">5,000</button>
+            <button data-target="10000" class="btn-preset-target cyber-btn text-xs py-1 px-2.5">10,000</button>
+            <button data-target="20000" class="btn-preset-target cyber-btn text-xs py-1 px-2.5">20,000</button>
+          </div>
+
+          <!-- Quick Delta Add / Subtract Buttons -->
+          <div class="flex flex-wrap items-center gap-1.5 text-xs font-mono-tech">
+            <span class="text-[10px] text-gray-400 mr-1">ปรับเร็ว:</span>
+            <button data-delta="-1000" class="btn-target-delta cyber-btn text-xs py-0.5 px-2 !border-red-500/40 text-red-300 hover:!bg-red-500/20">-1,000</button>
+            <button data-delta="-500" class="btn-target-delta cyber-btn text-xs py-0.5 px-2 !border-red-500/40 text-red-300 hover:!bg-red-500/20">-500</button>
+            <button data-delta="500" class="btn-target-delta cyber-btn text-xs py-0.5 px-2 !border-[#00ff66]/40 text-[#00ff66] hover:!bg-[#00ff66]/20">+500</button>
+            <button data-delta="1000" class="btn-target-delta cyber-btn text-xs py-0.5 px-2 !border-[#00ff66]/40 text-[#00ff66] hover:!bg-[#00ff66]/20">+1,000</button>
+          </div>
+
+          <!-- Number Input & Stepper Controls -->
+          <div class="flex items-center gap-2">
+            <div class="flex items-center bg-black/60 border border-[#00f0ff]/50 rounded overflow-hidden">
+              <button id="btnTargetStepDown" type="button" class="px-2.5 py-1 text-sm font-bold text-gray-300 hover:bg-[#00f0ff]/20 hover:text-[#00f0ff] transition-colors">-</button>
+              <input id="inputTarget" type="number" value="2026" min="10" max="1000000" step="100" class="bg-transparent border-x border-[#00f0ff]/30 px-2 py-1 text-xs font-orbitron text-[#ffe600] w-28 text-center focus:outline-none focus:bg-[#00f0ff]/10">
+              <button id="btnTargetStepUp" type="button" class="px-2.5 py-1 text-sm font-bold text-gray-300 hover:bg-[#00f0ff]/20 hover:text-[#00f0ff] transition-colors">+</button>
+            </div>
+            <button id="btnSetTarget" type="button" class="cyber-btn cyber-btn-yellow text-xs py-1 px-3">
+              💾 บันทึกเป้าหมาย
+            </button>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- SECTION 2: LIVE ACTIONS & AUDIO TOOLS -->
+      <div class="cyber-panel p-5 space-y-4">
+        <h2 class="font-orbitron text-base font-bold text-[#00f0ff] flex items-center gap-2">
+          🎮 GAME ACTIONS (การแทรกแซงสด)
+        </h2>
+
+        <!-- Energy Modifiers -->
+        <div>
+          <div class="text-xs text-gray-400 font-mono-tech mb-1.5">เพิ่ม / ลด พลังงานทันที:</div>
+          <div class="grid grid-cols-4 gap-2">
+            <button id="btnMinus100" class="cyber-btn py-2 text-xs font-bold border-red-500/50 text-red-400 hover:bg-red-500/20">
+              -100 (ดึงเวลา)
+            </button>
+            <button id="btnAdd100" class="cyber-btn py-2 text-xs font-bold">
+              +100
+            </button>
+            <button id="btnAdd500" class="cyber-btn py-2 text-xs font-bold">
+              +500
+            </button>
+            <button id="btnAdd1000" class="cyber-btn cyber-btn-yellow py-2 text-xs font-bold">
+              +1,000
+            </button>
+          </div>
+        </div>
+
+        <!-- Force 100% (Instant Game Start) -->
+        <div class="pt-1">
+          <button id="btnForceStart" class="w-full cyber-btn cyber-btn-yellow py-3 text-sm font-black flex items-center justify-center gap-2 shadow-[0_0_20px_rgba(255,230,0,0.3)]">
+            <span>🚀</span> FORCE 100% (จบเกมทันที / GAME START)
+          </button>
+          <p class="text-[10px] text-gray-400 mt-1 text-center">
+            แตะ 2 ครั้งเพื่อยืนยัน — ใช้ปลดล็อกพิธีเปิดทันทีเมื่อถึงคิวบนเวที
+          </p>
+        </div>
+
+        <!-- Reset Button -->
+        <div class="pt-1">
+          <button id="btnReset" class="w-full cyber-btn cyber-btn-pink py-2.5 text-xs font-bold flex items-center justify-center gap-2">
+            <span>🔄</span> RESET GAME (เริ่มนับ 0 ใหม่)
+          </button>
+        </div>
+
+        <!-- Audio Tests -->
+        <div class="border-t border-[#00f0ff]/20 pt-3">
+          <div class="text-xs text-gray-400 font-mono-tech mb-1.5">ทดสอบสังเคราะห์เสียง Web Audio API:</div>
+          <div class="grid grid-cols-3 gap-2">
+            <button id="btnTestPop" class="cyber-btn text-xs py-1.5">
+              🔔 Test Pop
+            </button>
+            <button id="btnTestBGM" class="cyber-btn text-xs py-1.5">
+              🎵 Toggle BGM
+            </button>
+            <button id="btnTestFanfare" class="cyber-btn cyber-btn-yellow text-xs py-1.5">
+              🎺 Test Fanfare
+            </button>
+          </div>
+        </div>
+
+        <!-- Activity Log -->
+        <div>
+          <div class="text-xs font-mono-tech text-gray-400 mb-1 flex items-center justify-between">
+            <span>SYSTEM LOGS:</span>
+            <button onclick="document.getElementById('logContainer').innerHTML=''" class="text-[10px] text-gray-400 hover:text-white">เคลียร์</button>
+          </div>
+          <div id="logContainer" class="bg-black/70 rounded-lg p-2.5 h-28 overflow-y-auto font-mono-tech text-[10px] space-y-1 text-gray-300 border border-white/10">
+            <div class="text-gray-500">[SYSTEM] Admin Mission Control initialized.</div>
+          </div>
+        </div>
+
+      </div>
+
+    </div>
+
+  </div>
+
+  <!-- Socket.IO & Logic Scripts -->
+  <script src="/socket.io/socket.io.js"></script>
+  <script src="js/audio.js"></script>
+  <script src="js/admin.js"></script>
+</body>
+</html>
