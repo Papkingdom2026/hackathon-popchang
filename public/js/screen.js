@@ -79,12 +79,11 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   // =========================================================================
-  // 1. Audio Control (Autoplay Policy compliance & dynamic BGM)
+  // 1. Audio Control (Autoplay Policy compliance & dynamic SFX - silent early stage)
   // =========================================================================
   btnStartAudio.addEventListener('click', () => {
     if (!isAudioStarted) {
       window.hackathonAudio.init();
-      window.hackathonAudio.startBGM();
       isAudioStarted = true;
       audioIcon.textContent = '🔊';
       audioStatusText.textContent = 'AUDIO ACTIVE';
@@ -98,7 +97,7 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 
   // =========================================================================
-  // 2. Dynamic QR Code generation for projector
+  // 2. Dynamic QR Code generation for projector (Crisp B&W)
   // =========================================================================
   async function loadQRCode() {
     try {
@@ -118,6 +117,18 @@ document.addEventListener('DOMContentLoaded', () => {
   btnToggleQR.addEventListener('click', () => {
     qrModal.classList.toggle('hidden');
   });
+
+  if (btnToggleLeaderboard && leaderboardPanel) {
+    btnToggleLeaderboard.addEventListener('click', () => {
+      leaderboardPanel.classList.toggle('hidden');
+    });
+  }
+
+  if (btnCloseLeaderboard && leaderboardPanel) {
+    btnCloseLeaderboard.addEventListener('click', () => {
+      leaderboardPanel.classList.add('hidden');
+    });
+  }
 
   // =========================================================================
   // 3. Ambient Starfield Background Canvas
@@ -320,11 +331,13 @@ document.addEventListener('DOMContentLoaded', () => {
   function checkPresidentButton(percentage) {
     if (percentage >= 67.4 && !presidentRevealedLocal && !isGameUnlocked) {
       presidentRevealedLocal = true;
-      presidentTouchArea.classList.remove('hidden');
-      requestAnimationFrame(() => {
-        presidentTouchArea.classList.remove('opacity-0', 'pointer-events-none', 'translate-y-2');
-        presidentTouchArea.classList.add('opacity-100', 'translate-y-0');
-      });
+      presidentTouchArea.classList.remove('opacity-0', 'pointer-events-none');
+      presidentTouchArea.classList.add('opacity-100', 'pointer-events-auto');
+
+      // Play dramatic crystal notification chime
+      if (window.hackathonAudio) {
+        window.hackathonAudio.playUnlockNotification();
+      }
     }
   }
 
@@ -646,7 +659,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Reset overlay & presidential button states
     if (presidentTouchArea) {
-      presidentTouchArea.classList.add('hidden', 'opacity-0', 'pointer-events-none');
+      presidentTouchArea.classList.remove('opacity-100', 'pointer-events-auto');
+      presidentTouchArea.classList.add('opacity-0', 'pointer-events-none');
     }
     if (giant67Overlay) {
       giant67Overlay.classList.remove('opacity-100');
@@ -671,9 +685,5 @@ document.addEventListener('DOMContentLoaded', () => {
     floatingNameTokens.length = 0;
     processedTappers.clear();
     updateDisplay(data);
-
-    if (isAudioStarted) {
-      window.hackathonAudio.startBGM();
-    }
   });
 });

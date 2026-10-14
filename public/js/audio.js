@@ -84,84 +84,12 @@ class HackathonAudioEngine {
   }
 
   /* =========================================================================
-   * 2. MELLOW BASS & WATER DROPLET CHIMES BGM
-   * Non-intrusive, warm ambient pulse with delicate water droplet pings
-   * Fades out from 40%, ultra-quiet from 55%, complete silence by 90%!
+   * 2. MELLOW BASS & WATER DROPLET CHIMES BGM (Disabled for early stage)
+   * Early stage is kept completely silent per user direction.
    * ========================================================================= */
   startBGM() {
-    if (this.isBGMPlaying) return;
-    this.init();
-    if (!this.ctx) return;
-
-    this.isBGMPlaying = true;
-    this.bgmGainNode = this.ctx.createGain();
-    this.bgmGainNode.gain.setValueAtTime(this.isMuted ? 0 : 0.26, this.ctx.currentTime);
-    this.bgmGainNode.connect(this.ctx.destination);
-
-    // Warm pentatonic water droplet chime frequencies (D4, F4, G4, A4, C5, D5, E5)
-    const dropletNotes = [293.66, 349.23, 392.00, 440.00, 523.25, 587.33, 659.25];
-    // Gentle deep sub-bass progression (D2 73.4Hz, F2 87.3Hz, G2 98.0Hz, A2 110.0Hz)
-    const bassNotes = [73.42, 73.42, 87.31, 98.00];
-
-    const stepDuration = 0.22; // ~136 BPM 8th notes, calm pulse
-    this.bgmStep = 0;
-
-    const playStep = () => {
-      if (!this.isBGMPlaying || !this.ctx) return;
-
-      const t = this.ctx.currentTime;
-      const step = this.bgmStep % 16;
-
-      // 1. Warm Mellow Bass on beats 0, 4, 8, 12
-      if (step % 4 === 0) {
-        const bassFreq = bassNotes[(step / 4) % bassNotes.length];
-        const bassOsc = this.ctx.createOscillator();
-        const bassGain = this.ctx.createGain();
-        const bassFilter = this.ctx.createBiquadFilter();
-
-        bassOsc.type = 'triangle';
-        bassOsc.frequency.setValueAtTime(bassFreq, t);
-
-        bassFilter.type = 'lowpass';
-        bassFilter.frequency.setValueAtTime(240, t);
-
-        bassGain.gain.setValueAtTime(0.35, t);
-        bassGain.gain.exponentialRampToValueAtTime(0.001, t + stepDuration * 3.6);
-
-        bassOsc.connect(bassFilter);
-        bassFilter.connect(bassGain);
-        bassGain.connect(this.bgmGainNode);
-
-        bassOsc.start(t);
-        bassOsc.stop(t + stepDuration * 4);
-      }
-
-      // 2. Delicate Water Droplet / Crystal Chime Ping (Occasional, subtle)
-      const chimeChance = [0, 2, 5, 7, 8, 10, 13, 15];
-      if (chimeChance.includes(step)) {
-        const chimeFreq = dropletNotes[step % dropletNotes.length];
-        const chimeOsc = this.ctx.createOscillator();
-        const chimeGain = this.ctx.createGain();
-
-        chimeOsc.type = 'sine';
-        chimeOsc.frequency.setValueAtTime(chimeFreq, t);
-
-        // Water droplet ping envelope: instant attack, sweet resonant ping decay
-        chimeGain.gain.setValueAtTime(0.12, t);
-        chimeGain.gain.exponentialRampToValueAtTime(0.001, t + 0.35);
-
-        chimeOsc.connect(chimeGain);
-        chimeGain.connect(this.bgmGainNode);
-
-        chimeOsc.start(t);
-        chimeOsc.stop(t + 0.38);
-      }
-
-      this.bgmStep++;
-      this.bgmTimer = setTimeout(playStep, stepDuration * 1000);
-    };
-
-    playStep();
+    // Early stage is kept completely silent per user direction
+    this.isBGMPlaying = false;
   }
 
   // Volume Fading Curve requested by user:
@@ -270,6 +198,42 @@ class HackathonAudioEngine {
   // Alias for backward compatibility
   playGameStart() {
     this.playHeavyBassBoom();
+  }
+
+  /* =========================================================================
+   * 3.0 PRESIDENTIAL BUTTON UNLOCK NOTIFICATION (When 67.5% button appears)
+   * Crisp, majestic, crystal cyber notification chime (C5 -> G5 -> C6 -> E6)
+   * ========================================================================= */
+  playUnlockNotification() {
+    if (this.isMuted) return;
+    this.init();
+    if (!this.ctx) return;
+
+    const t = this.ctx.currentTime;
+    const tones = [
+      { freq: 523.25, time: 0.00, dur: 0.35, vol: 0.35 }, // C5
+      { freq: 783.99, time: 0.12, dur: 0.40, vol: 0.40 }, // G5
+      { freq: 1046.50, time: 0.24, dur: 0.65, vol: 0.45 }, // C6
+      { freq: 1318.51, time: 0.36, dur: 0.90, vol: 0.50 }  // E6
+    ];
+
+    tones.forEach((n) => {
+      const noteTime = t + n.time;
+      const osc = this.ctx.createOscillator();
+      const gain = this.ctx.createGain();
+
+      osc.type = 'sine';
+      osc.frequency.setValueAtTime(n.freq, noteTime);
+
+      gain.gain.setValueAtTime(0, noteTime);
+      gain.gain.linearRampToValueAtTime(n.vol, noteTime + 0.02);
+      gain.gain.exponentialRampToValueAtTime(0.001, noteTime + n.dur);
+
+      osc.connect(gain);
+      gain.connect(this.ctx.destination);
+      osc.start(noteTime);
+      osc.stop(noteTime + n.dur + 0.05);
+    });
   }
 
   /* =========================================================================

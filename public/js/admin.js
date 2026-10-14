@@ -256,8 +256,23 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
+  let presidentConfirmTimeout = null;
   if (btnAdminPresidentTouch) {
     btnAdminPresidentTouch.addEventListener('click', () => {
+      if (!presidentConfirmTimeout) {
+        btnAdminPresidentTouch.innerHTML = '<span>⚠️</span> กดอีกครั้งเพื่อยืนยัน (ประธานแตะ)';
+        btnAdminPresidentTouch.classList.add('animate-pulse');
+        presidentConfirmTimeout = setTimeout(() => {
+          btnAdminPresidentTouch.innerHTML = '⚡ จำลองประธานแตะ ➔ 100%';
+          btnAdminPresidentTouch.classList.remove('animate-pulse');
+          presidentConfirmTimeout = null;
+        }, 3500);
+        return;
+      }
+      clearTimeout(presidentConfirmTimeout);
+      presidentConfirmTimeout = null;
+      btnAdminPresidentTouch.innerHTML = '⚡ จำลองประธานแตะ ➔ 100%';
+      btnAdminPresidentTouch.classList.remove('animate-pulse');
       socket.emit('admin_president_touch');
       addLog('⚡ Presidential Touch Triggered -> Boosting to 100%!', 'text-[#ffe600] font-bold');
     });

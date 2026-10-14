@@ -166,21 +166,12 @@
         </span>
       </div>
 
-      <!-- PRESIDENTIAL DUAL TOUCH BUTTON (Appears at 67.5% Plateau) -->
-      <div id="presidentTouchArea" class="mt-2.5 text-center transition-all duration-700 opacity-0 pointer-events-none transform translate-y-2 hidden">
-        <button id="btnPresidentTouch" class="president-cyber-btn group">
-          <div class="flex items-center justify-center gap-3.5 px-6 py-2">
-            <span class="text-2xl animate-bounce">✋</span>
-            <div class="text-left">
-              <div class="font-orbitron font-black text-xs sm:text-sm text-[#ffe600] tracking-wider neon-glow-yellow flex items-center gap-2">
-                <span>⚡ PRESIDENTIAL OVERDRIVE : แตะหน้าจอพร้อมกัน ⚡</span>
-              </div>
-              <div class="text-[10px] font-mono-tech text-[#00f0ff] tracking-wide">
-                [ ประธาน 2 ท่านสัมผัสหน้าจอพร้อมกัน เพื่อส่งพลังงานก้อนสุดท้าย 100% ]
-              </div>
-            </div>
-            <span class="text-2xl animate-bounce">✋</span>
-          </div>
+      <!-- PRESIDENTIAL DUAL TOUCH BUTTON (Absolute positioning: ZERO layout reflow or shift!) -->
+      <div id="presidentTouchArea" class="absolute top-[102%] left-1/2 -translate-x-1/2 z-30 text-center transition-all duration-700 opacity-0 pointer-events-none select-none">
+        <button id="btnPresidentTouch" class="president-cyber-btn px-10 py-2.5 rounded-2xl shadow-[0_0_35px_rgba(255,230,0,0.6)]">
+          <span class="font-orbitron font-black text-xl sm:text-2xl md:text-3xl text-[#ffe600] tracking-widest neon-glow-yellow uppercase select-none">
+            TOUCH TO START
+          </span>
         </button>
       </div>
 
@@ -231,35 +222,35 @@
     </div>
   </footer>
 
-  <!-- TOP 20 HACKERS LEADERBOARD PANEL (SLIDING CYBER PANEL) -->
-  <div id="leaderboardPanel" class="fixed top-16 right-4 z-40 w-72 md:w-80 cyber-panel p-3.5 flex flex-col bg-[#01082d]/95 backdrop-blur-md border border-[#00f0ff]/30 shadow-[0_0_25px_rgba(0,240,255,0.25)] transition-all duration-300">
-    <div class="flex items-center justify-between pb-2 border-b border-[#00f0ff]/20 mb-2">
-      <div class="flex items-center gap-2">
-        <span class="text-base animate-pulse">🏆</span>
-        <span class="font-orbitron text-xs font-bold text-[#ffe600] tracking-wider">TOP 20 HACKERS</span>
+  <!-- TOP 20 HACKERS LEADERBOARD PANEL (COMPACT ON FAR RIGHT, HIDDEN BY DEFAULT) -->
+  <div id="leaderboardPanel" class="fixed top-16 right-3 z-40 w-60 md:w-64 max-w-[260px] cyber-panel p-3 flex flex-col bg-[#01082d]/95 backdrop-blur-md border border-[#00f0ff]/30 shadow-[0_0_25px_rgba(0,240,255,0.25)] transition-all duration-300 hidden">
+    <div class="flex items-center justify-between pb-1.5 border-b border-[#00f0ff]/20 mb-2">
+      <div class="flex items-center gap-1.5">
+        <span class="text-sm">🏆</span>
+        <span class="font-orbitron text-[11px] font-bold text-[#ffe600] tracking-wider">TOP 20 HACKERS</span>
       </div>
       <button id="btnCloseLeaderboard" class="text-xs text-gray-400 hover:text-white px-1 font-mono-tech">[✕]</button>
     </div>
-    <div id="leaderboardList" class="max-h-[60vh] overflow-y-auto space-y-1.5 pr-1 custom-scrollbar">
+    <div id="leaderboardList" class="max-h-[55vh] overflow-y-auto space-y-1 pr-1 custom-scrollbar">
       <div class="text-center text-xs text-gray-400 font-mono-tech py-6">
         กำลังรอผู้เข้าร่วมส่งพลังงาน...
       </div>
     </div>
   </div>
 
-  <!-- FLOATING QR CODE CARD (TOGGLEABLE) -->
-  <div id="qrModal" class="absolute top-16 right-6 z-40 cyber-panel p-4 flex flex-col items-center gap-2.5 bg-[#01082d]/95 transition-all duration-300 hidden">
-    <div class="text-xs font-orbitron font-bold text-[#00f0ff] tracking-wider">
-      📱 SCAN TO JOIN HACKATHON
+  <!-- FLOATING QR CODE CARD (TOGGLEABLE - CRISP HIGH-CONTRAST B&W) -->
+  <div id="qrModal" class="fixed top-16 right-4 z-50 bg-white text-gray-900 p-5 rounded-2xl shadow-[0_0_40px_rgba(255,255,255,0.8)] border-4 border-gray-100 flex flex-col items-center gap-2.5 transition-all duration-300 hidden">
+    <div class="text-xs font-orbitron font-black text-black tracking-wider uppercase">
+      SCAN TO JOIN HACKATHON
     </div>
-    <div class="bg-white p-2 rounded-xl border-2 border-[#00f0ff] shadow-[0_0_20px_rgba(0,240,255,0.4)]">
-      <img id="qrImg" src="" alt="QR Code" class="w-36 h-36 object-contain">
+    <div class="p-1 bg-white rounded-xl border border-gray-200">
+      <img id="qrImg" src="" alt="QR Code" class="w-44 h-44 object-contain">
     </div>
-    <div class="text-center font-mono-tech text-xs text-gray-200">
-      <span id="qrUrlText" class="text-[#ffe600] font-semibold break-all">http://...</span>
+    <div class="text-center font-mono-tech text-[11px] text-gray-800 font-bold max-w-[200px]">
+      <span id="qrUrlText" class="text-blue-700 break-all font-mono"></span>
     </div>
-    <button onclick="document.getElementById('qrModal').classList.add('hidden')" class="text-[10px] text-gray-400 hover:text-white underline">
-      [ซ่อน QR Code]
+    <button onclick="document.getElementById('qrModal').classList.add('hidden')" class="text-[11px] text-gray-500 hover:text-black font-semibold underline mt-1">
+      [ ปิด QR Code ]
     </button>
   </div>
 

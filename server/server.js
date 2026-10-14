@@ -54,16 +54,16 @@ app.get('/api/info', (req, res) => {
   });
 });
 
-// Dynamic QR Code generation endpoint
+// Dynamic QR Code generation endpoint (Pure Black & White with Clean Margin)
 app.get('/api/qr', async (req, res) => {
   try {
     const host = req.query.host || `http://${LOCAL_IP}:${PORT}`;
     const qrDataUrl = await QRCode.toDataURL(host, {
-      margin: 1,
-      width: 300,
+      margin: 2,
+      width: 340,
       color: {
-        dark: '#00F0FF',
-        light: '#01082d'
+        dark: '#000000',
+        light: '#ffffff'
       }
     });
     res.json({ url: host, qrDataUrl });
@@ -89,8 +89,8 @@ let gameState = {
   totalBatchesReceived: 0
 };
 
-// Players and Leaderboard map
-// key: socket.id -> { name: string, clicks: number, lastActive: number }
+// Persistent Players and Leaderboard map
+// key: playerId -> { id, name: string, clicks: number, socketId: string, isOnline: boolean, lastActive: number }
 const players = new Map();
 const recentTappers = [];
 
@@ -114,8 +114,9 @@ function calculateCPS() {
 }
 
 function getTopPlayers() {
+  const now = Date.now();
   return Array.from(players.values())
-    .filter(p => p.clicks > 0)
+    .filter(p => p.clicks > 0 && (p.isOnline || (now - p.lastActive < 45000)))
     .sort((a, b) => b.clicks - a.clicks)
     .slice(0, 20)
     .map((p, idx) => ({
@@ -153,19 +154,32 @@ io.on('connection', (socket) => {
     topPlayers: getTopPlayers()
   });
 
-  // Client updates player nickname
+  // Client updates player nickname and persistent playerId
   socket.on('set_player_name', (data) => {
     const rawName = (data?.name || '').trim().slice(0, 35);
-    const existing = players.get(socket.id);
-    if (existing) {
-      existing.name = rawName || existing.name;
+    const playerId = (data?.playerId || socket.id).trim();
+    socket.playerId = playerId;
+
+    let player = players.get(playerId);
+    if (player) {
+      if (rawName) player.name = rawName;
+      player.socketId = socket.id;
+      player.isOnline = true;
+      player.lastActive = Date.now();
     } else {
-      players.set(socket.id, {
+      player = {
+        id: playerId,
         name: rawName || 'ผู้เข้าร่วม',
         clicks: 0,
+        socketId: socket.id,
+        isOnline: true,
         lastActive: Date.now()
-      });
+      };
+      players.set(playerId, player);
     }
+
+    // Send back previous personal clicks so player can resume score!
+    socket.emit('player_restored', { clicks: player.clicks, name: player.name });
   });
 
   // Client batch clicks event (sent every 100ms by client)
@@ -179,14 +193,17 @@ io.on('connection', (socket) => {
     // Safety clamp (max 100 raw clicks per 100ms batch from a single client)
     const validCount = Math.min(count, 100);
 
-    // Track Player in Leaderboard
+    // Track Player in Leaderboard by persistent playerId
+    const playerId = (data?.playerId || socket.playerId || socket.id).trim();
     const rawPlayerName = (data?.playerName || '').trim().slice(0, 35);
-    let player = players.get(socket.id);
+    let player = players.get(playerId);
     if (!player) {
-      player = { name: rawPlayerName || 'ผู้เข้าร่วม', clicks: 0, lastActive: Date.now() };
-      players.set(socket.id, player);
-    } else if (rawPlayerName && player.name !== rawPlayerName) {
-      player.name = rawPlayerName;
+      player = { id: playerId, name: rawPlayerName || 'ผู้เข้าร่วม', clicks: 0, socketId: socket.id, isOnline: true, lastActive: Date.now() };
+      players.set(playerId, player);
+    } else {
+      if (rawPlayerName && player.name !== rawPlayerName) player.name = rawPlayerName;
+      player.isOnline = true;
+      player.socketId = socket.id;
     }
     player.clicks += validCount;
     player.lastActive = Date.now();
@@ -211,8 +228,10 @@ io.on('connection', (socket) => {
     gameState.totalBatchesReceived++;
     recordClicks(validCount);
 
-    // Dynamic 67% Plateau Control Logic
+    // Dynamic 67% Plateau Control Logic (Slow Crawl 67.0% -> 67.9%)
     const currentPct = (gameState.currentClicks / gameState.targetClicks) * 100;
+    const cap67_0 = gameState.targetClicks * 0.670;
+    const cap67_9 = gameState.targetClicks * 0.679;
 
     // If President has NOT triggered yet:
     if (!gameState.presidentTriggered) {
@@ -225,17 +244,15 @@ io.on('connection', (socket) => {
           io.emit('stage_67_reached', { timestamp: Date.now() });
         }
 
-        // Crawl super slowly between 67.0% and 67.9% maximum:
-        // Even with 100 people tapping, it never exceeds 67.9%
-        const cap67_9 = gameState.targetClicks * 0.679;
+        // Crawl slowly from 67.0% to 67.9% maximum:
+        // Gives the feeling of struggling to reach 70%, but can never reach 70% without presidents!
         if (!gameState.isFrozen && gameState.currentClicks < cap67_9) {
-          gameState.currentClicks = Math.min(cap67_9, gameState.currentClicks + (validCount * 0.006));
+          gameState.currentClicks = Math.min(cap67_9, gameState.currentClicks + Math.max(0.03, validCount * 0.012));
         }
       } else {
         // Below 67%: Normal advancement, capped strictly at 67.0%
         if (!gameState.isFrozen) {
           const effectivePoints = validCount * gameState.clickMultiplier;
-          const cap67_0 = gameState.targetClicks * 0.670;
           if (gameState.currentClicks + effectivePoints >= cap67_0) {
             gameState.currentClicks = cap67_0;
             gameState.eventStatus = 'PLATEAU_67';
@@ -299,6 +316,21 @@ io.on('connection', (socket) => {
 
   // Trigger from Admin remote override
   socket.on('admin_president_touch', () => {
+    triggerPresidentialSurge();
+  });
+
+  // Admin Controls: Direct Emergency Click Adjust (+/- 100, 500, 1000)
+  socket.on('admin_add_clicks', (data) => {
+    const amount = parseInt(data?.amount, 10);
+    if (!isNaN(amount)) {
+      gameState.currentClicks = Math.max(0, Math.min(gameState.targetClicks, gameState.currentClicks + amount));
+      console.log(`⚡ [ADMIN] Direct click adjust: ${amount > 0 ? '+' : ''}${amount} -> Current: ${gameState.currentClicks}`);
+    }
+  });
+
+  // Admin Controls: Force 100% Start (Instant Climax)
+  socket.on('admin_force_start', () => {
+    console.log('🚀 [ADMIN] admin_force_start received! Triggering 100% surge...');
     triggerPresidentialSurge();
   });
 
@@ -420,6 +452,11 @@ io.on('connection', (socket) => {
 
   socket.on('disconnect', () => {
     connectedUsers = Math.max(0, connectedUsers - 1);
+    if (socket.playerId && players.has(socket.playerId)) {
+      const p = players.get(socket.playerId);
+      p.isOnline = false;
+      p.lastActive = Date.now();
+    }
   });
 });
 

@@ -103,7 +103,13 @@ document.addEventListener('DOMContentLoaded', () => {
   }
   renderBgParticles();
 
-  // Registration & Nickname System
+  // Registration & Nickname System with Persistent Player ID
+  let myPlayerId = localStorage.getItem('hacker_id');
+  if (!myPlayerId) {
+    myPlayerId = 'p_' + Math.random().toString(36).substring(2, 9) + Date.now().toString(36);
+    localStorage.setItem('hacker_id', myPlayerId);
+  }
+
   let currentHackerName = localStorage.getItem('hacker_name') || '';
   if (currentHackerName) {
     playerNameDisplay.textContent = currentHackerName;
@@ -121,7 +127,7 @@ document.addEventListener('DOMContentLoaded', () => {
     localStorage.setItem('hacker_name', currentHackerName);
     playerNameDisplay.textContent = currentHackerName;
     nameModal.classList.add('hidden');
-    socket.emit('set_player_name', { name: currentHackerName });
+    socket.emit('set_player_name', { name: currentHackerName, playerId: myPlayerId });
   });
 
   inputPlayerName.addEventListener('keydown', (e) => {
@@ -169,13 +175,14 @@ document.addEventListener('DOMContentLoaded', () => {
     btnAudioToggle.classList.toggle('text-[#00f0ff]', !isMuted);
   });
 
-  // Client Batching to Server every 100ms with Nickname
+  // Client Batching to Server every 100ms with Nickname and persistent playerId
   const BATCH_INTERVAL_MS = 100;
   setInterval(() => {
     if (pendingBatchClicks > 0 && socket.connected) {
       socket.emit('batch_clicks', { 
         count: pendingBatchClicks,
-        playerName: currentHackerName || 'Anonymous'
+        playerName: currentHackerName || 'Anonymous',
+        playerId: myPlayerId
       });
       pendingBatchClicks = 0;
     }
@@ -398,7 +405,14 @@ document.addEventListener('DOMContentLoaded', () => {
 
   socket.on('connect', () => {
     if (currentHackerName) {
-      socket.emit('set_player_name', { name: currentHackerName });
+      socket.emit('set_player_name', { name: currentHackerName, playerId: myPlayerId });
+    }
+  });
+
+  socket.on('player_restored', (data) => {
+    if (data && typeof data.clicks === 'number' && data.clicks > personalTotalClicks) {
+      personalTotalClicks = data.clicks;
+      myClicksEl.textContent = personalTotalClicks.toLocaleString();
     }
   });
 
