@@ -33,6 +33,19 @@ document.addEventListener('DOMContentLoaded', () => {
   const btnForceStart = document.getElementById('btnForceStart');
   const btnReset = document.getElementById('btnReset');
 
+  // Event State & Smooth Controls DOM
+  const badgeEventStatus = document.getElementById('badgeEventStatus');
+  const btnEventStart = document.getElementById('btnEventStart');
+  const btnEventStandby = document.getElementById('btnEventStandby');
+  const btnToggleFreeze = document.getElementById('btnToggleFreeze');
+  const btnGlideMinus5 = document.getElementById('btnGlideMinus5');
+  const btnGlideMinus2 = document.getElementById('btnGlideMinus2');
+  const btnGlidePlus2 = document.getElementById('btnGlidePlus2');
+  const btnGlidePlus5 = document.getElementById('btnGlidePlus5');
+  const btnForce67 = document.getElementById('btnForce67');
+  const btnAdminPresidentTouch = document.getElementById('btnAdminPresidentTouch');
+  const adminLeaderboardList = document.getElementById('adminLeaderboardList');
+
   // Audio Tests DOM
   const btnTestPop = document.getElementById('btnTestPop');
   const btnTestBGM = document.getElementById('btnTestBGM');
@@ -43,6 +56,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
   let currentMultiplier = 1.0;
   let isBGMTesting = false;
+  let isSystemFrozen = false;
 
   function addLog(msg, color = 'text-gray-300') {
     const time = new Date().toLocaleTimeString();
@@ -186,6 +200,69 @@ document.addEventListener('DOMContentLoaded', () => {
     addLog('🚀 Added +1,000 Energy Points', 'text-[#ffe600]');
   });
 
+  // Event State Controls (Start / Standby)
+  if (btnEventStart) {
+    btnEventStart.addEventListener('click', () => {
+      socket.emit('admin_set_status', { status: 'RUNNING' });
+      addLog('🟢 Started Ceremony (Players can tap!)', 'text-[#00ff66] font-bold');
+    });
+  }
+
+  if (btnEventStandby) {
+    btnEventStandby.addEventListener('click', () => {
+      socket.emit('admin_set_status', { status: 'STANDBY' });
+      addLog('⏸️ Event set to STANDBY (Players waiting)', 'text-[#ffe600]');
+    });
+  }
+
+  // Smooth Energy Glides (No sudden jumps)
+  if (btnGlideMinus5) {
+    btnGlideMinus5.addEventListener('click', () => {
+      socket.emit('admin_glide_energy', { deltaPercent: -5.0, durationSec: 3.0 });
+      addLog('🌊 Gliding -5.0% over 3s...', 'text-red-400');
+    });
+  }
+  if (btnGlideMinus2) {
+    btnGlideMinus2.addEventListener('click', () => {
+      socket.emit('admin_glide_energy', { deltaPercent: -2.0, durationSec: 2.0 });
+      addLog('🌊 Gliding -2.0% over 2s...', 'text-red-400');
+    });
+  }
+  if (btnGlidePlus2) {
+    btnGlidePlus2.addEventListener('click', () => {
+      socket.emit('admin_glide_energy', { deltaPercent: 2.0, durationSec: 2.0 });
+      addLog('🌊 Gliding +2.0% over 2s...', 'text-[#00ff66]');
+    });
+  }
+  if (btnGlidePlus5) {
+    btnGlidePlus5.addEventListener('click', () => {
+      socket.emit('admin_glide_energy', { deltaPercent: 5.0, durationSec: 3.0 });
+      addLog('🌊 Gliding +5.0% over 3s...', 'text-[#ffe600]');
+    });
+  }
+
+  // Freeze Toggle
+  if (btnToggleFreeze) {
+    btnToggleFreeze.addEventListener('click', () => {
+      socket.emit('admin_toggle_freeze');
+    });
+  }
+
+  // Stage 67% Plateau & Presidential Touch
+  if (btnForce67) {
+    btnForce67.addEventListener('click', () => {
+      socket.emit('admin_force_67');
+      addLog('🔒 Forcing 67% Plateau (President Button Revealed)', 'text-purple-400 font-bold');
+    });
+  }
+
+  if (btnAdminPresidentTouch) {
+    btnAdminPresidentTouch.addEventListener('click', () => {
+      socket.emit('admin_president_touch');
+      addLog('⚡ Presidential Touch Triggered -> Boosting to 100%!', 'text-[#ffe600] font-bold');
+    });
+  }
+
   // Force 100% with Inline 2-Click Confirmation
   let forceConfirmTimeout = null;
   btnForceStart.addEventListener('click', () => {
@@ -193,7 +270,7 @@ document.addEventListener('DOMContentLoaded', () => {
       btnForceStart.innerHTML = '<span>⚠️</span> กดอีกครั้งเพื่อยืนยัน (FORCE 100%)';
       btnForceStart.classList.add('animate-pulse');
       forceConfirmTimeout = setTimeout(() => {
-        btnForceStart.innerHTML = '<span>🚀</span> FORCE 100% (จบเกมทันที / GAME START)';
+        btnForceStart.innerHTML = '<span>🚀</span> FORCE 100% (จบพิธีทันที / จุดพลุ + จอขาว)';
         btnForceStart.classList.remove('animate-pulse');
         forceConfirmTimeout = null;
       }, 3500);
@@ -201,7 +278,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
     clearTimeout(forceConfirmTimeout);
     forceConfirmTimeout = null;
-    btnForceStart.innerHTML = '<span>🚀</span> FORCE 100% (จบเกมทันที / GAME START)';
+    btnForceStart.innerHTML = '<span>🚀</span> FORCE 100% (จบพิธีทันที / จุดพลุ + จอขาว)';
     btnForceStart.classList.remove('animate-pulse');
     socket.emit('admin_force_start');
     addLog('🚀 Admin triggered FORCE 100%!', 'text-[#ffe600] font-bold');
@@ -333,7 +410,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     if (data.isGameStarted) {
-      adminStatusText.textContent = 'GAME START COMPLETED';
+      adminStatusText.textContent = 'FINISHED (WHITE SCREEN CLIMAX)';
       adminStatusText.className = 'px-2.5 py-0.5 rounded text-[11px] font-bold bg-[#ffe600]/20 text-[#ffe600] border border-[#ffe600]/50 animate-pulse';
     } else if (data.percentage > 0) {
       adminStatusText.textContent = 'ACTIVE (ACCUMULATING ENERGY)';
@@ -342,5 +419,65 @@ document.addEventListener('DOMContentLoaded', () => {
       adminStatusText.textContent = 'WAITING FOR PLAYERS';
       adminStatusText.className = 'px-2.5 py-0.5 rounded text-[11px] font-bold bg-[#00ff66]/10 text-[#00ff66] border border-[#00ff66]/30';
     }
+
+    // Event Status Badge
+    if (data.eventStatus && badgeEventStatus) {
+      if (data.eventStatus === 'STANDBY') {
+        badgeEventStatus.textContent = 'STANDBY (รอปล่อยตัว)';
+        badgeEventStatus.className = 'px-2.5 py-0.5 rounded text-[11px] font-bold bg-[#ffe600]/20 text-[#ffe600] border border-[#ffe600]/50 animate-pulse';
+      } else if (data.eventStatus === 'RUNNING') {
+        badgeEventStatus.textContent = 'RUNNING (กำลังแข่ง)';
+        badgeEventStatus.className = 'px-2.5 py-0.5 rounded text-[11px] font-bold bg-[#00ff66]/20 text-[#00ff66] border border-[#00ff66]/50';
+      } else if (data.eventStatus === 'PLATEAU_67') {
+        badgeEventStatus.textContent = 'PLATEAU 67% (รอประธานแตะ)';
+        badgeEventStatus.className = 'px-2.5 py-0.5 rounded text-[11px] font-bold bg-purple-500/20 text-purple-300 border border-purple-500/50 animate-pulse';
+      } else if (data.eventStatus === 'FINISHED') {
+        badgeEventStatus.textContent = 'FINISHED (สำเร็จแล้ว)';
+        badgeEventStatus.className = 'px-2.5 py-0.5 rounded text-[11px] font-bold bg-[#00f0ff]/20 text-[#00f0ff] border border-[#00f0ff]/50';
+      }
+    }
+
+    // Freeze State
+    if (data.isFrozen !== undefined && btnToggleFreeze) {
+      isSystemFrozen = !!data.isFrozen;
+      if (isSystemFrozen) {
+        btnToggleFreeze.textContent = '🔥 ปลดล็อค (UNFREEZE)';
+        btnToggleFreeze.className = 'cyber-btn cyber-btn-pink text-[10px] py-1 px-2 animate-pulse';
+      } else {
+        btnToggleFreeze.textContent = '❄️ ตรึง % คงที่ (FREEZE)';
+        btnToggleFreeze.className = 'cyber-btn text-[10px] py-1 px-2 border-cyan-400';
+      }
+    }
+
+    // Top 20 Leaderboard
+    if (data.topPlayers) {
+      renderAdminLeaderboard(data.topPlayers);
+    }
+  }
+
+  function renderAdminLeaderboard(topPlayers) {
+    if (!adminLeaderboardList) return;
+    if (!topPlayers || topPlayers.length === 0) {
+      adminLeaderboardList.innerHTML = '<div class="text-gray-500 text-center py-4 col-span-full">ยังไม่มีคะแนนผู้เล่น</div>';
+      return;
+    }
+    adminLeaderboardList.innerHTML = '';
+    topPlayers.forEach(p => {
+      const card = document.createElement('div');
+      card.className = 'p-2 rounded bg-black/50 border border-white/10 flex items-center justify-between';
+      let rankBadge = `<span class="text-gray-400 font-bold">#${p.rank}</span>`;
+      if (p.rank === 1) rankBadge = `<span class="text-[#ffe600] font-black text-sm">🥇 #1</span>`;
+      else if (p.rank === 2) rankBadge = `<span class="text-gray-200 font-bold">🥈 #2</span>`;
+      else if (p.rank === 3) rankBadge = `<span class="text-amber-500 font-bold">🥉 #3</span>`;
+
+      card.innerHTML = `
+        <div class="flex items-center gap-2 overflow-hidden pr-1">
+          ${rankBadge}
+          <span class="truncate font-sans font-bold text-white text-xs" title="${p.name}">${p.name}</span>
+        </div>
+        <span class="font-orbitron font-bold text-[#00f0ff] shrink-0 text-xs">${p.clicks.toLocaleString()}</span>
+      `;
+      adminLeaderboardList.appendChild(card);
+    });
   }
 });

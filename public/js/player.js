@@ -22,6 +22,15 @@ document.addEventListener('DOMContentLoaded', () => {
   const modalFinalClicks = document.getElementById('modalFinalClicks');
   const btnAudioToggle = document.getElementById('btnAudioToggle');
 
+  // NEW: Registration, Standby, and Stage 67 Modals
+  const playerNameDisplay = document.getElementById('playerNameDisplay');
+  const btnEditName = document.getElementById('btnEditName');
+  const nameModal = document.getElementById('nameModal');
+  const inputPlayerName = document.getElementById('inputPlayerName');
+  const btnSaveName = document.getElementById('btnSaveName');
+  const standbyModal = document.getElementById('standbyModal');
+  const stage67Modal = document.getElementById('stage67Modal');
+
   // Build Retro Segmented Progress Bar (24 segments)
   const TOTAL_SEGMENTS = 24;
   const segments = [];
@@ -94,11 +103,45 @@ document.addEventListener('DOMContentLoaded', () => {
   }
   renderBgParticles();
 
+  // Registration & Nickname System
+  let currentHackerName = localStorage.getItem('hacker_name') || '';
+  if (currentHackerName) {
+    playerNameDisplay.textContent = currentHackerName;
+  } else {
+    nameModal.classList.remove('hidden');
+  }
+
+  btnSaveName.addEventListener('click', () => {
+    const val = inputPlayerName.value.trim();
+    if (!val) {
+      inputPlayerName.focus();
+      return;
+    }
+    currentHackerName = val;
+    localStorage.setItem('hacker_name', currentHackerName);
+    playerNameDisplay.textContent = currentHackerName;
+    nameModal.classList.add('hidden');
+    socket.emit('set_player_name', { name: currentHackerName });
+  });
+
+  inputPlayerName.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter') {
+      btnSaveName.click();
+    }
+  });
+
+  btnEditName.addEventListener('click', () => {
+    inputPlayerName.value = currentHackerName;
+    nameModal.classList.remove('hidden');
+    inputPlayerName.focus();
+  });
+
   // State Variables
   let personalTotalClicks = 0;
   let pendingBatchClicks = 0;
   let closeMouthTimeout = null;
   let isGameUnlocked = false;
+  let currentEventStatus = 'STANDBY';
 
   // Personal CPS tracking
   const personalClickHistory = [];
@@ -126,11 +169,14 @@ document.addEventListener('DOMContentLoaded', () => {
     btnAudioToggle.classList.toggle('text-[#00f0ff]', !isMuted);
   });
 
-  // Client Batching to Server every 100ms
+  // Client Batching to Server every 100ms with Nickname
   const BATCH_INTERVAL_MS = 100;
   setInterval(() => {
     if (pendingBatchClicks > 0 && socket.connected) {
-      socket.emit('batch_clicks', { count: pendingBatchClicks });
+      socket.emit('batch_clicks', { 
+        count: pendingBatchClicks,
+        playerName: currentHackerName || 'Anonymous'
+      });
       pendingBatchClicks = 0;
     }
   }, BATCH_INTERVAL_MS);
@@ -293,6 +339,11 @@ document.addEventListener('DOMContentLoaded', () => {
   function handleTap(x, y) {
     if (isGameUnlocked) return;
 
+    if (currentEventStatus === 'STANDBY') {
+      standbyModal.classList.remove('hidden');
+      return;
+    }
+
     // 1. Audio pop SFX
     window.hackathonAudio.playPop();
 
@@ -345,6 +396,12 @@ document.addEventListener('DOMContentLoaded', () => {
   // Socket.IO Events
   let isForceSurging = false;
 
+  socket.on('connect', () => {
+    if (currentHackerName) {
+      socket.emit('set_player_name', { name: currentHackerName });
+    }
+  });
+
   socket.on('game_init', (data) => {
     updateHUD(data);
   });
@@ -353,6 +410,11 @@ document.addEventListener('DOMContentLoaded', () => {
     if (!isForceSurging) {
       updateHUD(data);
     }
+  });
+
+  socket.on('stage_67_reached', () => {
+    currentEventStatus = 'PLATEAU_67';
+    stage67Modal.classList.remove('hidden');
   });
 
   socket.on('game_force_charging', (data) => {
@@ -401,17 +463,32 @@ document.addEventListener('DOMContentLoaded', () => {
   function updateHUD(data) {
     if (!data) return;
 
+    // Event status check
+    if (data.eventStatus) {
+      currentEventStatus = data.eventStatus;
+      if (currentEventStatus === 'STANDBY') {
+        standbyModal.classList.remove('hidden');
+      } else {
+        standbyModal.classList.add('hidden');
+      }
+    }
+
     // Only display percentage, do NOT reveal target number 2026!
     if (data.percentage !== undefined) {
       const pct = Math.min(100, Math.max(0, data.percentage));
       headerPercentEl.textContent = `${pct.toFixed(1)}%`;
       updateRetroSegments(pct);
+
+      if (currentEventStatus === 'PLATEAU_67' || (pct >= 67.0 && !data.isGameStarted)) {
+        stage67Modal.classList.remove('hidden');
+      }
     }
+
     if (data.onlineUsers !== undefined) {
       onlineCountEl.textContent = data.onlineUsers;
     }
 
-    if (data.isGameStarted && !isGameUnlocked) {
+    if ((data.isGameStarted || data.percentage >= 100) && !isGameUnlocked) {
       triggerGameStart();
     }
   }
@@ -423,8 +500,21 @@ document.addEventListener('DOMContentLoaded', () => {
 
   function triggerGameStart() {
     isGameUnlocked = true;
-    modalFinalClicks.textContent = personalTotalClicks.toLocaleString();
-    gameStartModal.classList.remove('hidden');
+    stage67Modal.classList.add('hidden');
+    standbyModal.classList.add('hidden');
+    if (gameStartModal) gameStartModal.classList.add('hidden');
+
+    // Smooth whiteout transition (no GAME START popup)
+    let whiteout = document.getElementById('whiteoutOverlay');
+    if (!whiteout) {
+      whiteout = document.createElement('div');
+      whiteout.id = 'whiteoutOverlay';
+      whiteout.style.cssText = 'position:fixed;inset:0;background:#ffffff;z-index:9999;opacity:0;transition:opacity 0.8s ease-in-out;pointer-events:none;';
+      document.body.appendChild(whiteout);
+    }
+    setTimeout(() => {
+      whiteout.style.opacity = '1';
+    }, 150);
 
     if ('vibrate' in navigator) {
       try {
@@ -436,7 +526,10 @@ document.addEventListener('DOMContentLoaded', () => {
   socket.on('game_reset', (data) => {
     isGameUnlocked = false;
     isForceSurging = false;
-    gameStartModal.classList.add('hidden');
+    const whiteout = document.getElementById('whiteoutOverlay');
+    if (whiteout) whiteout.style.opacity = '0';
+    if (gameStartModal) gameStartModal.classList.add('hidden');
+    stage67Modal.classList.add('hidden');
     personalTotalClicks = 0;
     myClicksEl.textContent = '0';
     updateHUD(data);

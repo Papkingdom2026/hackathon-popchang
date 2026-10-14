@@ -205,20 +205,83 @@
           🎮 GAME ACTIONS (การแทรกแซงสด)
         </h2>
 
-        <!-- Energy Modifiers -->
-        <div>
-          <div class="text-xs text-gray-400 font-mono-tech mb-1.5">เพิ่ม / ลด พลังงานทันที:</div>
-          <div class="grid grid-cols-4 gap-2">
-            <button id="btnMinus100" class="cyber-btn py-2 text-xs font-bold border-red-500/50 text-red-400 hover:bg-red-500/20">
-              -100 (ดึงเวลา)
+        <!-- EVENT STATE CONTROLLER (NEW) -->
+        <div class="bg-black/40 rounded-xl p-3 border border-[#00f0ff]/30 space-y-2">
+          <div class="flex items-center justify-between text-xs font-mono-tech">
+            <span class="text-[#ffe600] font-bold">🎬 สถานะพิธีเปิด:</span>
+            <span id="badgeEventStatus" class="px-2.5 py-0.5 rounded text-[11px] font-bold bg-[#ffe600]/20 text-[#ffe600] border border-[#ffe600]/50">
+              STANDBY
+            </span>
+          </div>
+          <div class="grid grid-cols-2 gap-2 text-xs">
+            <button id="btnEventStart" class="cyber-btn cyber-btn-yellow py-2 font-bold flex items-center justify-center gap-1.5">
+              🟢 เริ่มปล่อยตัว (START)
             </button>
-            <button id="btnAdd100" class="cyber-btn py-2 text-xs font-bold">
+            <button id="btnEventStandby" class="cyber-btn py-2 font-bold flex items-center justify-center gap-1.5 text-gray-300">
+              ⏸️ พัก / สแตนด์บาย
+            </button>
+          </div>
+        </div>
+
+        <!-- SMOOTH ENERGY GLIDE & FREEZE (NEW) -->
+        <div class="bg-black/40 rounded-xl p-3 border border-[#00f0ff]/30 space-y-2">
+          <div class="flex items-center justify-between text-xs font-mono-tech">
+            <span class="text-[#00f0ff] font-bold">🌊 ปรับเปอร์เซ็นต์แบบเนียนๆ (ไม่กระโดด):</span>
+            <button id="btnToggleFreeze" class="cyber-btn text-[10px] py-1 px-2 border-cyan-400">
+              ❄️ ตรึง % คงที่ (FREEZE)
+            </button>
+          </div>
+          <div class="grid grid-cols-4 gap-2 text-xs">
+            <button id="btnGlideMinus5" class="cyber-btn py-1.5 text-[11px] font-bold border-red-500/40 text-red-300 hover:bg-red-500/20">
+              🌊 -5%
+            </button>
+            <button id="btnGlideMinus2" class="cyber-btn py-1.5 text-[11px] font-bold border-red-500/40 text-red-300 hover:bg-red-500/20">
+              🌊 -2%
+            </button>
+            <button id="btnGlidePlus2" class="cyber-btn py-1.5 text-[11px] font-bold border-[#00ff66]/40 text-[#00ff66] hover:bg-[#00ff66]/20">
+              🌊 +2%
+            </button>
+            <button id="btnGlidePlus5" class="cyber-btn py-1.5 text-[11px] font-bold border-[#ffe600]/40 text-[#ffe600] hover:bg-[#ffe600]/20">
+              🌊 +5%
+            </button>
+          </div>
+          <p class="text-[10px] text-gray-400">
+            💡 หลอดพลังงานจะค่อยๆ ไหลขึ้น/ลงแบบนุ่มนวล ผู้เล่นจะไม่ทราบว่าแอดมินแทรกแซง
+          </p>
+        </div>
+
+        <!-- STAGE 67% & PRESIDENTIAL OVERRIDE (NEW) -->
+        <div class="bg-black/40 rounded-xl p-3 border border-[#ffe600]/30 space-y-2">
+          <div class="text-xs text-[#ffe600] font-mono-tech font-bold flex items-center justify-between">
+            <span>👑 จังหวะประธานแตะจอ (67% ➔ 100%):</span>
+          </div>
+          <div class="grid grid-cols-2 gap-2 text-xs">
+            <button id="btnForce67" class="cyber-btn py-2 text-[11px] font-bold border-purple-500/50 text-purple-300 hover:bg-purple-500/20">
+              🔒 บังคับค้าง 67% (ปุ่มประธาน)
+            </button>
+            <button id="btnAdminPresidentTouch" class="cyber-btn cyber-btn-yellow py-2 text-[11px] font-black">
+              ⚡ จำลองประธานแตะ ➔ 100%
+            </button>
+          </div>
+          <p class="text-[10px] text-gray-400">
+            เมื่อแตะแล้วจะจุดพลุเฉลิมฉลองและเปลี่ยนเป็นจอขาวทันที (ไม่ขึ้น Game Start)
+          </p>
+        </div>
+
+        <!-- Energy Modifiers (Direct fallback) -->
+        <div>
+          <div class="text-xs text-gray-400 font-mono-tech mb-1.5">ปรับแต้มพลังงานโดยตรง (ฉุกเฉิน):</div>
+          <div class="grid grid-cols-4 gap-2">
+            <button id="btnMinus100" class="cyber-btn py-1.5 text-xs font-bold border-red-500/50 text-red-400 hover:bg-red-500/20">
+              -100
+            </button>
+            <button id="btnAdd100" class="cyber-btn py-1.5 text-xs font-bold">
               +100
             </button>
-            <button id="btnAdd500" class="cyber-btn py-2 text-xs font-bold">
+            <button id="btnAdd500" class="cyber-btn py-1.5 text-xs font-bold">
               +500
             </button>
-            <button id="btnAdd1000" class="cyber-btn cyber-btn-yellow py-2 text-xs font-bold">
+            <button id="btnAdd1000" class="cyber-btn cyber-btn-yellow py-1.5 text-xs font-bold">
               +1,000
             </button>
           </div>
@@ -226,23 +289,20 @@
 
         <!-- Force 100% (Instant Game Start) -->
         <div class="pt-1">
-          <button id="btnForceStart" class="w-full cyber-btn cyber-btn-yellow py-3 text-sm font-black flex items-center justify-center gap-2 shadow-[0_0_20px_rgba(255,230,0,0.3)]">
-            <span>🚀</span> FORCE 100% (จบเกมทันที / GAME START)
+          <button id="btnForceStart" class="w-full cyber-btn cyber-btn-yellow py-2.5 text-xs font-black flex items-center justify-center gap-2 shadow-[0_0_20px_rgba(255,230,0,0.3)]">
+            <span>🚀</span> FORCE 100% (จบพิธีทันที / จุดพลุ + จอขาว)
           </button>
-          <p class="text-[10px] text-gray-400 mt-1 text-center">
-            แตะ 2 ครั้งเพื่อยืนยัน — ใช้ปลดล็อกพิธีเปิดทันทีเมื่อถึงคิวบนเวที
-          </p>
         </div>
 
         <!-- Reset Button -->
-        <div class="pt-1">
-          <button id="btnReset" class="w-full cyber-btn cyber-btn-pink py-2.5 text-xs font-bold flex items-center justify-center gap-2">
+        <div>
+          <button id="btnReset" class="w-full cyber-btn cyber-btn-pink py-2 text-xs font-bold flex items-center justify-center gap-2">
             <span>🔄</span> RESET GAME (เริ่มนับ 0 ใหม่)
           </button>
         </div>
 
         <!-- Audio Tests -->
-        <div class="border-t border-[#00f0ff]/20 pt-3">
+        <div class="border-t border-[#00f0ff]/20 pt-2.5">
           <div class="text-xs text-gray-400 font-mono-tech mb-1.5">ทดสอบสังเคราะห์เสียง Web Audio API:</div>
           <div class="grid grid-cols-3 gap-2">
             <button id="btnTestPop" class="cyber-btn text-xs py-1.5">
@@ -263,13 +323,26 @@
             <span>SYSTEM LOGS:</span>
             <button onclick="document.getElementById('logContainer').innerHTML=''" class="text-[10px] text-gray-400 hover:text-white">เคลียร์</button>
           </div>
-          <div id="logContainer" class="bg-black/70 rounded-lg p-2.5 h-28 overflow-y-auto font-mono-tech text-[10px] space-y-1 text-gray-300 border border-white/10">
+          <div id="logContainer" class="bg-black/70 rounded-lg p-2.5 h-24 overflow-y-auto font-mono-tech text-[10px] space-y-1 text-gray-300 border border-white/10">
             <div class="text-gray-500">[SYSTEM] Admin Mission Control initialized.</div>
           </div>
         </div>
 
       </div>
 
+    </div>
+
+    <!-- LIVE LEADERBOARD (TOP 20 HACKERS) (NEW) -->
+    <div class="cyber-panel p-5 space-y-3">
+      <div class="flex items-center justify-between">
+        <h2 class="font-orbitron text-base font-bold text-[#ffe600] flex items-center gap-2">
+          🏆 LIVE TOP PLAYERS (รายชื่อผู้ร่วมส่งพลังงานสูงสุด)
+        </h2>
+        <span class="text-xs font-mono-tech text-gray-400">อัปเดตแบบ Real-time ตามชื่อที่ลงทะเบียน</span>
+      </div>
+      <div id="adminLeaderboardList" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-2.5 text-xs font-mono-tech">
+        <div class="text-gray-500 text-center py-4 col-span-full">กำลังรอข้อมูลผู้เล่น...</div>
+      </div>
     </div>
 
   </div>

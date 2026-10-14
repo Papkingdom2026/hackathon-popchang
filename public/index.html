@@ -34,29 +34,37 @@
   <!-- Radiant Energy Flash on Tap -->
   <div id="tapEnergyFlash" class="tap-energy-flash"></div>
 
-  <!-- TOP HUD: STATS & ENERGY CONDUIT BAR (MOVED TO TOP AS REQUESTED) -->
+  <!-- TOP HUD: STATS & ENERGY CONDUIT BAR -->
   <header class="w-full pt-3 px-4 z-20 max-w-md">
     
-    <!-- Top Stats Row -->
-    <div class="flex items-center justify-between font-mono-tech text-xs mb-2">
-      <!-- Online Beacon -->
+    <!-- Player Name & Online Row -->
+    <div class="flex items-center justify-between font-mono-tech text-xs mb-1.5 px-0.5">
+      <!-- Player Nickname with Edit -->
       <div class="flex items-center gap-1.5">
-        <span class="w-2 h-2 rounded-full bg-[#00ff66] pulse-indicator"></span>
-        <span class="text-gray-300">ONLINE: <span id="onlineCount" class="text-[#00ff66] font-bold">1</span></span>
+        <span class="text-gray-400">👤:</span>
+        <span id="playerNameDisplay" class="font-bold text-[#00f0ff] truncate max-w-[140px]">ผู้เข้าร่วม</span>
+        <button id="btnEditName" class="text-[10px] text-gray-400 hover:text-white px-1" title="เปลี่ยนชื่อ">✏️</button>
       </div>
 
-      <!-- Personal Clicks Counter (Prominent) -->
-      <div class="flex items-center gap-1.5 px-3 py-1 rounded-full bg-black/50 border border-[#00f0ff]/30 shadow-[0_0_15px_rgba(0,240,255,0.25)]">
+      <!-- Online Beacon & Sound Toggle -->
+      <div class="flex items-center gap-2">
+        <span class="w-2 h-2 rounded-full bg-[#00ff66] pulse-indicator"></span>
+        <span class="text-gray-300">ONLINE: <span id="onlineCount" class="text-[#00ff66] font-bold">1</span></span>
+        <!-- Sound Toggle -->
+        <button id="btnAudioToggle" class="bg-black/50 hover:bg-black/70 text-[#00f0ff] px-2 py-0.5 rounded border border-[#00f0ff]/30 text-[11px] transition">
+          🔊
+        </button>
+      </div>
+    </div>
+
+    <!-- Personal Clicks Bar Row -->
+    <div class="flex items-center justify-between font-mono-tech text-xs mb-2">
+      <div class="flex items-center gap-1.5 px-3 py-1 rounded-full bg-black/50 border border-[#00f0ff]/30 shadow-[0_0_15px_rgba(0,240,255,0.25)] w-full justify-between">
         <span class="text-[#ffe600] font-bold text-xs">⚡ พลังที่คุณส่ง:</span>
         <span class="font-orbitron font-black text-lg text-[#ffe600] neon-glow-yellow">
           <span id="myClicks">0</span>
         </span>
       </div>
-
-      <!-- Sound Toggle -->
-      <button id="btnAudioToggle" class="bg-black/50 hover:bg-black/70 text-[#00f0ff] px-2.5 py-1 rounded border border-[#00f0ff]/30 text-[11px] transition">
-        🔊
-      </button>
     </div>
 
     <!-- Retro Segmented Energy Conduit Bar (Target 2026 is kept secret!) -->
@@ -108,14 +116,69 @@
     </div>
   </footer>
 
+  <!-- REGISTRATION / NAME ENTRY MODAL -->
+  <div id="nameModal" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/85 backdrop-blur-md hidden">
+    <div class="cyber-panel w-full max-w-sm p-6 text-center space-y-4 border-2 border-[#00f0ff] shadow-[0_0_30px_rgba(0,240,255,0.4)]">
+      <div class="text-4xl">🎮</div>
+      <div>
+        <h2 class="font-orbitron text-lg font-black text-[#ffe600] neon-glow-yellow">
+          ลงทะเบียนผู้ส่งพลังงาน
+        </h2>
+        <p class="text-xs text-gray-300 mt-1">
+          กรอกชื่อเล่น ตามด้วย จ.ภ. เพื่อบันทึกคะแนนขึ้นจอใหญ่
+        </p>
+      </div>
+      <div class="space-y-1.5 text-left">
+        <label class="text-[11px] text-[#00f0ff] font-mono-tech block">ชื่อของคุณ:</label>
+        <input id="inputPlayerName" type="text" maxlength="30" placeholder="เช่น ต้นน้ำ จ.ภ.พิษณุโลก" class="w-full bg-[#01082d] border border-[#00f0ff]/50 rounded-lg px-3.5 py-2.5 text-sm text-white placeholder-gray-500 focus:outline-none focus:border-[#ffe600] focus:ring-1 focus:ring-[#ffe600]">
+        <p class="text-[10px] text-gray-400">💡 ตัวอย่าง: บอส จ.ภ.ตรัง, นิว จ.ภ.มุกดาหาร</p>
+      </div>
+      <button id="btnSaveName" class="cyber-btn cyber-btn-yellow w-full py-2.5 text-sm font-bold font-orbitron">
+        🚀 ยืนยัน / เข้าสู่ห้องส่งพลังงาน
+      </button>
+    </div>
+  </div>
+
+  <!-- STANDBY / WAITING FOR STAGE SIGNAL -->
+  <div id="standbyModal" class="fixed inset-0 z-40 flex flex-col items-center justify-center p-6 text-center bg-black/80 backdrop-blur-sm hidden">
+    <div class="text-5xl mb-3 animate-pulse">⏳</div>
+    <div class="font-orbitron text-xl font-bold text-[#ffe600] mb-2 neon-glow-yellow">
+      รอสัญญาณปล่อยตัวจากเวที...
+    </div>
+    <p class="text-xs text-gray-300 max-w-xs mb-4">
+      ระบบเตรียมพร้อมแล้ว! เมื่อพิธีกรนับถอยหลัง ให้ช่วยกันรัวนิ้วส่งพลังงานทันที
+    </p>
+    <div class="inline-block px-4 py-1.5 rounded-full bg-[#00f0ff]/10 border border-[#00f0ff]/30 text-xs font-mono-tech text-[#00f0ff]">
+      STATUS: STANDBY MODE
+    </div>
+  </div>
+
+  <!-- STAGE 67% NOTICE MODAL (Direct gaze to auditorium screen) -->
+  <div id="stage67Modal" class="fixed inset-0 z-45 flex flex-col items-center justify-center p-6 text-center bg-black/85 backdrop-blur-md hidden">
+    <div class="text-5xl mb-3 animate-bounce">💖</div>
+    <div class="font-orbitron text-lg sm:text-xl font-black text-[#ffe600] neon-glow-yellow mb-2">
+      ขอบคุณสำหรับการส่งพลังงานครั้งนี้!
+    </div>
+    <div class="my-3 p-4 rounded-xl bg-[#00f0ff]/10 border border-[#00f0ff]/40 shadow-[0_0_20px_rgba(0,240,255,0.3)] max-w-xs">
+      <div class="text-3xl mb-1.5">🖥️ 👀 ⬆️</div>
+      <p class="text-sm font-bold text-white leading-relaxed">
+        โปรดมองที่จอหอประชุม<br>
+        <span class="text-[#00ff66]">เพื่อส่งพลังงานก้อนสุดท้ายพร้อมกัน</span>
+      </p>
+    </div>
+    <div class="text-xs font-mono-tech text-gray-300 animate-pulse">
+      ✦ DUAL PRESIDENTIAL OVERDRIVE INCOMING ✦
+    </div>
+  </div>
+
   <!-- CELEBRATION MODAL ON GAME START -->
   <div id="gameStartModal" class="fixed inset-0 bg-[#010626]/95 z-50 flex flex-col items-center justify-center p-6 text-center hidden">
     <div class="text-6xl mb-3 animate-bounce">🚀</div>
-    <div class="font-orbitron text-4xl sm:text-5xl font-black text-[#ffe600] neon-glow-yellow mb-2">
-      GAME START!
+    <div class="font-orbitron text-3xl sm:text-4xl font-black text-[#ffe600] neon-glow-yellow mb-2">
+      100% UNLOCKED!
     </div>
-    <p class="text-[#00f0ff] font-bold text-lg mb-2">
-      ปลดล็อกพิธีเปิดสำเร็จแล้ว!
+    <p class="text-[#00f0ff] font-bold text-base mb-2">
+      พิธีเปิดสำเร็จเสร็จสิ้นสมบูรณ์!
     </p>
     <div class="cyber-panel px-6 py-4 my-4">
       <div class="text-xs text-gray-400">คุณมีส่วนร่วมส่งพลังไปทั้งหมด</div>
@@ -123,8 +186,8 @@
         <span id="modalFinalClicks">0</span> ครั้ง!
       </div>
     </div>
-    <button onclick="document.getElementById('gameStartModal').classList.add('hidden')" class="cyber-btn text-sm">
-      ดูหน้าจอต่อ
+    <button onclick="document.getElementById('gameStartModal').classList.add('hidden')" class="cyber-btn text-xs py-1.5 px-4">
+      ปิดหน้านี้
     </button>
   </div>
 

@@ -37,10 +37,22 @@ document.addEventListener('DOMContentLoaded', () => {
   const doorWhiteLight = document.getElementById('doorWhiteLight');
   const whiteOutOverlay = document.getElementById('whiteOutOverlay');
 
+  // NEW: Leaderboard, Floating Names, 67% Overlay, and Presidential Touch Elements
+  const floatingNamesCanvas = document.getElementById('floatingNamesCanvas');
+  const giant67Overlay = document.getElementById('giant67Overlay');
+  const presidentTouchArea = document.getElementById('presidentTouchArea');
+  const btnPresidentTouch = document.getElementById('btnPresidentTouch');
+  const leaderboardPanel = document.getElementById('leaderboardPanel');
+  const leaderboardList = document.getElementById('leaderboardList');
+  const btnToggleLeaderboard = document.getElementById('btnToggleLeaderboard');
+  const btnCloseLeaderboard = document.getElementById('btnCloseLeaderboard');
+
   let isAudioStarted = false;
   let isGameUnlocked = false;
   let currentPercentageVal = 0;
   let finaleTimers = [];
+  let stage67TriggeredLocal = false;
+  let presidentRevealedLocal = false;
 
   // Build Retro Segmented Bar (36 segments on projector screen)
   const TOTAL_SCREEN_SEGMENTS = 36;
@@ -154,6 +166,177 @@ document.addEventListener('DOMContentLoaded', () => {
   }
   renderStars();
 
+  // Floating Names Background Canvas Engine (Loopless Thai Font)
+  const namesCanvas = document.getElementById('floatingNamesCanvas');
+  const namesCtx = namesCanvas ? namesCanvas.getContext('2d') : null;
+  const floatingNameTokens = [];
+  const processedTappers = new Set();
+
+  function resizeNamesCanvas() {
+    if (!namesCanvas) return;
+    namesCanvas.width = window.innerWidth;
+    namesCanvas.height = window.innerHeight;
+  }
+  window.addEventListener('resize', resizeNamesCanvas);
+  resizeNamesCanvas();
+
+  function spawnFloatingName(text) {
+    if (!namesCanvas || !text) return;
+    if (floatingNameTokens.length > 30) floatingNameTokens.shift();
+
+    const colors = ['#00f0ff', '#ffe600', '#ff9e1f', '#00ff66', '#ffffff'];
+    floatingNameTokens.push({
+      text,
+      x: Math.random() * (namesCanvas.width - 240) + 30,
+      y: namesCanvas.height + 20,
+      vx: (Math.random() - 0.5) * 0.6,
+      vy: -(Math.random() * 1.5 + 1.2),
+      alpha: 0.95,
+      size: Math.random() * 4 + 14,
+      color: colors[Math.floor(Math.random() * colors.length)]
+    });
+  }
+
+  function renderFloatingNames() {
+    if (!namesCtx) return;
+    namesCtx.clearRect(0, 0, namesCanvas.width, namesCanvas.height);
+
+    for (let i = floatingNameTokens.length - 1; i >= 0; i--) {
+      const item = floatingNameTokens[i];
+      item.x += item.vx;
+      item.y += item.vy;
+      item.alpha -= 0.0035;
+
+      if (item.alpha <= 0 || item.y < -30) {
+        floatingNameTokens.splice(i, 1);
+        continue;
+      }
+
+      namesCtx.save();
+      namesCtx.font = `bold ${item.size}px 'Chakra Petch', sans-serif`;
+      namesCtx.fillStyle = item.color;
+      namesCtx.globalAlpha = Math.max(0, item.alpha);
+      namesCtx.shadowColor = item.color;
+      namesCtx.shadowBlur = 8;
+      namesCtx.fillText(item.text, item.x, item.y);
+      namesCtx.restore();
+    }
+    requestAnimationFrame(renderFloatingNames);
+  }
+  renderFloatingNames();
+
+  // Leaderboard & 67% Controller
+  if (btnToggleLeaderboard) {
+    btnToggleLeaderboard.addEventListener('click', () => {
+      leaderboardPanel.classList.toggle('hidden');
+    });
+  }
+
+  if (btnCloseLeaderboard) {
+    btnCloseLeaderboard.addEventListener('click', () => {
+      leaderboardPanel.classList.add('hidden');
+    });
+  }
+
+  function escapeHtml(str) {
+    const div = document.createElement('div');
+    div.textContent = str;
+    return div.innerHTML;
+  }
+
+  function renderLeaderboard(playersList) {
+    if (!leaderboardList) return;
+    if (!playersList || playersList.length === 0) {
+      leaderboardList.innerHTML = `
+        <div class="text-center text-xs text-gray-400 font-mono-tech py-6">
+          กำลังรอผู้เข้าร่วมส่งพลังงาน...
+        </div>
+      `;
+      return;
+    }
+
+    let html = '';
+    playersList.forEach((p, idx) => {
+      const rank = p.rank || (idx + 1);
+      let rankBadge = '';
+      let rankClass = '';
+      let nameClass = '';
+      let scoreClass = '';
+
+      if (rank === 1) {
+        rankBadge = '👑 1';
+        rankClass = 'border-[#ffe600]/50 bg-[#ffe600]/15 shadow-[0_0_12px_rgba(255,230,0,0.3)]';
+        nameClass = 'text-sm font-black text-[#ffe600] neon-glow-yellow';
+        scoreClass = 'text-sm font-black text-[#ffe600] font-orbitron';
+      } else if (rank === 2) {
+        rankBadge = '🥈 2';
+        rankClass = 'border-gray-300/40 bg-gray-400/10';
+        nameClass = 'text-xs font-bold text-gray-200';
+        scoreClass = 'text-xs font-bold text-gray-200 font-orbitron';
+      } else if (rank === 3) {
+        rankBadge = '🥉 3';
+        rankClass = 'border-[#ff9e1f]/40 bg-[#ff9e1f]/10';
+        nameClass = 'text-xs font-bold text-[#ff9e1f]';
+        scoreClass = 'text-xs font-bold text-[#ff9e1f] font-orbitron';
+      } else if (rank <= 10) {
+        rankBadge = `#${rank}`;
+        rankClass = 'border-[#00f0ff]/25 bg-[#00f0ff]/5';
+        nameClass = 'text-xs text-gray-200 font-medium';
+        scoreClass = 'text-xs text-[#00f0ff] font-orbitron font-bold';
+      } else {
+        rankBadge = `#${rank}`;
+        rankClass = 'border-gray-800 bg-black/25';
+        nameClass = 'text-[11px] text-gray-400';
+        scoreClass = 'text-[10px] text-gray-400 font-orbitron';
+      }
+
+      html += `
+        <div class="flex items-center justify-between px-2.5 py-1.5 rounded-lg border ${rankClass} transition-all">
+          <div class="flex items-center gap-2 overflow-hidden pr-2">
+            <span class="w-7 text-center font-orbitron font-bold shrink-0">${rankBadge}</span>
+            <span class="truncate ${nameClass}">${escapeHtml(p.name)}</span>
+          </div>
+          <span class="${scoreClass} shrink-0">${p.clicks.toLocaleString()}</span>
+        </div>
+      `;
+    });
+
+    leaderboardList.innerHTML = html;
+  }
+
+  function triggerGiant67() {
+    if (stage67TriggeredLocal) return;
+    stage67TriggeredLocal = true;
+    console.log('⚡ Giant 67 activated on background for 5 seconds');
+    giant67Overlay.classList.remove('opacity-0');
+    giant67Overlay.classList.add('opacity-100');
+
+    setTimeout(() => {
+      giant67Overlay.classList.remove('opacity-100');
+      giant67Overlay.classList.add('opacity-0');
+    }, 5000); // 5 seconds
+  }
+
+  function checkPresidentButton(percentage) {
+    if (percentage >= 67.4 && !presidentRevealedLocal && !isGameUnlocked) {
+      presidentRevealedLocal = true;
+      presidentTouchArea.classList.remove('hidden');
+      requestAnimationFrame(() => {
+        presidentTouchArea.classList.remove('opacity-0', 'pointer-events-none', 'translate-y-2');
+        presidentTouchArea.classList.add('opacity-100', 'translate-y-0');
+      });
+    }
+  }
+
+  if (btnPresidentTouch) {
+    btnPresidentTouch.addEventListener('click', () => {
+      if (isGameUnlocked) return;
+      btnPresidentTouch.classList.add('scale-95');
+      setTimeout(() => btnPresidentTouch.classList.remove('scale-95'), 200);
+      socket.emit('president_touch');
+    });
+  }
+
   // =========================================================================
   // 4. Liquid Bubbles Generator
   // =========================================================================
@@ -205,6 +388,33 @@ document.addEventListener('DOMContentLoaded', () => {
       window.hackathonAudio.updateBGMByPercentage(percentage);
     }
 
+    // 67% Plateau & Presidential Button Checks
+    if (percentage >= 67.0 || data.stage67Triggered) {
+      triggerGiant67();
+    }
+    if (percentage >= 67.4 || data.stage67Triggered) {
+      checkPresidentButton(percentage);
+    }
+
+    // Leaderboard Update
+    if (data.topPlayers) {
+      renderLeaderboard(data.topPlayers);
+    }
+
+    // Floating Names Update
+    if (data.recentTappers && data.recentTappers.length > 0) {
+      data.recentTappers.forEach(t => {
+        if (!processedTappers.has(t.id)) {
+          processedTappers.add(t.id);
+          spawnFloatingName(t.name);
+          if (processedTappers.size > 80) {
+            const first = processedTappers.values().next().value;
+            processedTappers.delete(first);
+          }
+        }
+      });
+    }
+
     // Dynamic Subtext status
     if (percentage < 25) {
       energyStatusSubtext.textContent = '⚡ TRANSMITTING HACKER ENERGY... TAP TO CHARGE ⚡';
@@ -212,12 +422,15 @@ document.addEventListener('DOMContentLoaded', () => {
     } else if (percentage < 50) {
       energyStatusSubtext.textContent = '🔋 POWER ACCELERATING... SENSORS SYNCHRONIZED 🔋';
       energyStatusSubtext.className = 'text-xs font-mono-tech tracking-wider text-[#00ff66] uppercase px-4 py-1 rounded-full bg-[#00ff66]/10 border border-[#00ff66]/30';
-    } else if (percentage < 85) {
+    } else if (percentage < 67) {
       energyStatusSubtext.textContent = '🔥 HIGH VOLTAGE! SYSTEM OVERCLOCKING! 🔥';
       energyStatusSubtext.className = 'text-xs font-mono-tech tracking-wider text-[#ff9e1f] uppercase px-4 py-1 rounded-full bg-[#ff9e1f]/15 border border-[#ff9e1f]/40 animate-pulse';
-    } else if (percentage < 100) {
-      energyStatusSubtext.textContent = '⚠️ CRITICAL CAPACITANCE REACHED! FINAL SURGE INCOMING! ⚠️';
+    } else if (percentage < 70) {
+      energyStatusSubtext.textContent = '✋ STAGE 67% REACHED : AWAITING PRESIDENTIAL OVERDRIVE ✋';
       energyStatusSubtext.className = 'text-xs font-mono-tech tracking-wider text-[#ffe600] uppercase px-4 py-1 rounded-full bg-[#ffe600]/20 border border-[#ffe600]/50 animate-pulse font-bold';
+    } else if (percentage < 100) {
+      energyStatusSubtext.textContent = '⚡ CRITICAL OVERDRIVE! MAXIMUM ENERGY SURGE INCOMING! ⚡';
+      energyStatusSubtext.className = 'text-xs font-mono-tech tracking-wider text-[#ff007f] uppercase px-4 py-1 rounded-full bg-[#ff007f]/20 border border-[#ff007f]/50 animate-pulse font-bold';
     }
 
     if (data.isGameStarted && !isGameUnlocked) {
@@ -290,7 +503,7 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   // =========================================================================
-  // 7. Grand Finale Trigger (100% Reached: Cinematic Ceremony Progression)
+  // 7. Grand Finale Trigger (Direct Fireworks + 10s Whiteout, No GAME START modal)
   // =========================================================================
   function clearFinaleTimers() {
     finaleTimers.forEach(id => clearTimeout(id));
@@ -301,100 +514,53 @@ document.addEventListener('DOMContentLoaded', () => {
     if (isGameUnlocked) return;
     isGameUnlocked = true;
 
-    console.log('🚀 GAME START GRAND FINALE LAUNCHED!');
+    console.log('🚀 100% REACHED! DIRECT FIREWORKS & WHITEOUT LAUNCHED!');
     clearFinaleTimers();
 
-    // --- PHASE 1 (0.0s): 100% Impact & Heavy Bass Boom ---
-    // Single heavy booming sub-bass hit (NO brass fanfare)
+    // 1. Single heavy booming sub-bass hit (NO brass fanfare)
     window.hackathonAudio.playHeavyBassBoom();
 
-    // Sub-bass physical vibration impact
+    // 2. Sub-bass physical vibration impact
     screenBody.classList.add('screen-shake');
     const tShake = setTimeout(() => {
       screenBody.classList.remove('screen-shake');
     }, 900);
     finaleTimers.push(tShake);
 
-    // Keep 100% banner visible clearly for ~1.8 seconds ("ค้างหน้า 100 เปอเซ็นไว้สักเกือบ 2 วิ ให้เห็นชื่องานก่อน")
+    // 3. Hide presidential button and update label
+    if (presidentTouchArea) {
+      presidentTouchArea.classList.add('opacity-0', 'pointer-events-none');
+    }
     energyStatusSubtext.textContent = '✦ CAPACITY 100% UNLOCKED ✦ CEREMONY ACTIVATED ✦';
     energyStatusSubtext.className = 'text-xs font-mono-tech tracking-wider text-[#ffe600] uppercase px-4 py-1 rounded-full bg-[#ffe600]/25 border border-[#ffe600] animate-pulse font-bold shadow-[0_0_20px_#ffe600]';
 
-    // --- PHASE 2 (~1.8s): "GAME START!" Popup for exactly 2 seconds ---
-    const tGameStart = setTimeout(() => {
-      finalDurationEl.textContent = data?.durationSeconds ? `${data.durationSeconds}s` : 'CLEAR!';
+    // 4. Explode Confetti / Fireworks immediately
+    createConfettiExplosion();
 
-      // Digital 8-bit game start power-up chime
-      window.hackathonAudio.playDigitalGameChime();
+    // 5. Directly transition into pure full-screen whiteout (NO GAME START MODAL as requested!)
+    const tWhiteIn = setTimeout(() => {
+      whiteOutOverlay.classList.add('whiteout-visible');
 
-      gameStartOverlay.classList.remove('hidden');
-      gameStartOverlay.style.opacity = '1';
-      gameStartOverlay.style.pointerEvents = 'auto';
+      // Hold pure white screen for 10 seconds ("ค้างไว้ 10 วิเลย แล้วก็มาหน้าปกติ")
+      const tWhiteHold = setTimeout(() => {
+        whiteOutOverlay.classList.remove('whiteout-visible');
 
-      createConfettiExplosion();
+        // Stop confetti
+        setTimeout(() => {
+          if (confettiAnimationId) {
+            cancelAnimationFrame(confettiAnimationId);
+            confettiAnimationId = null;
+            const ctx = confettiCanvas.getContext('2d');
+            ctx.clearRect(0, 0, confettiCanvas.width, confettiCanvas.height);
+            confettiCanvas.classList.add('hidden');
+          }
+        }, 1200);
 
-      // --- PHASE 3 (~3.8s, after 2 seconds): Disappear "GAME START!" and reveal banner again ---
-      const tHideGameStart = setTimeout(() => {
-        gameStartOverlay.style.opacity = '0';
-        const tFadeHide = setTimeout(() => {
-          gameStartOverlay.classList.add('hidden');
-        }, 400);
-        finaleTimers.push(tFadeHide);
+      }, 10000); // 10.0 seconds white screen hold!
+      finaleTimers.push(tWhiteHold);
 
-        // --- PHASE 4 (~4.2s): Door Split Animation & Cosmic Warp Whoosh ---
-        const tDoorOpen = setTimeout(() => {
-          // Play pneumatic door opening release + cosmic warp sound effect
-          window.hackathonAudio.playDoorWarpWhoosh();
-
-          // Prepare split doors & bright white light core
-          doorSplitStage.classList.remove('hidden');
-          doorWhiteLight.classList.add('door-white-flare');
-
-          // Part the doors into 2 sides (left & right)
-          requestAnimationFrame(() => {
-            doorSplitStage.classList.add('door-open-active');
-          });
-
-          // Zoom into white light -> Fullscreen pure white overlay
-          const tWhiteIn = setTimeout(() => {
-            whiteOutOverlay.classList.add('whiteout-visible');
-
-            // --- PHASE 5: Hold pure white screen for 10 seconds ("ค้างไว้ 10 วิเลย แล้วก็มาหน้าปกติ") ---
-            const tWhiteHold = setTimeout(() => {
-              // Fade white overlay back to normal screen
-              whiteOutOverlay.classList.remove('whiteout-visible');
-
-              // Reset split door panels and restore normal stage
-              const tResetDoors = setTimeout(() => {
-                doorSplitStage.classList.remove('door-open-active');
-                doorSplitStage.classList.add('hidden');
-                doorWhiteLight.classList.remove('door-white-flare');
-                gameStartOverlay.style.opacity = '1';
-
-                // Stop confetti animation
-                if (confettiAnimationId) {
-                  cancelAnimationFrame(confettiAnimationId);
-                  confettiAnimationId = null;
-                  const ctx = confettiCanvas.getContext('2d');
-                  ctx.clearRect(0, 0, confettiCanvas.width, confettiCanvas.height);
-                  confettiCanvas.classList.add('hidden');
-                }
-              }, 1200);
-              finaleTimers.push(tResetDoors);
-
-            }, 10000); // Hold for 10 seconds!
-            finaleTimers.push(tWhiteHold);
-
-          }, 850); // Timing into white zoom
-          finaleTimers.push(tWhiteIn);
-
-        }, 400); // Brief moment viewing the banner before doors part
-        finaleTimers.push(tDoorOpen);
-
-      }, 2000); // Exactly 2 seconds showing "GAME START!"
-      finaleTimers.push(tHideGameStart);
-
-    }, 1800); // Hold 100% banner for ~1.8s first
-    finaleTimers.push(tGameStart);
+    }, 600); // Brief moment celebrating then pure whiteout
+    finaleTimers.push(tWhiteIn);
   }
 
   // =========================================================================
@@ -412,9 +578,13 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   });
 
+  socket.on('stage_67_reached', () => {
+    triggerGiant67();
+  });
+
   socket.on('game_force_charging', (data) => {
     isForceSurging = true;
-    const duration = data.durationMs || 2200;
+    const duration = data.durationMs || 2500;
 
     // 1. Play dramatic rising riser synthesizer sweep
     if (isAudioStarted) {
@@ -471,8 +641,18 @@ document.addEventListener('DOMContentLoaded', () => {
     screenBody.classList.remove('charging-vibration');
     liquidWrapper.style.transition = '';
     isGameUnlocked = false;
+    stage67TriggeredLocal = false;
+    presidentRevealedLocal = false;
 
-    // Reset overlay & door states
+    // Reset overlay & presidential button states
+    if (presidentTouchArea) {
+      presidentTouchArea.classList.add('hidden', 'opacity-0', 'pointer-events-none');
+    }
+    if (giant67Overlay) {
+      giant67Overlay.classList.remove('opacity-100');
+      giant67Overlay.classList.add('opacity-0');
+    }
+
     gameStartOverlay.classList.add('hidden');
     gameStartOverlay.style.opacity = '1';
     gameStartOverlay.style.pointerEvents = 'none';
@@ -488,6 +668,8 @@ document.addEventListener('DOMContentLoaded', () => {
       confettiAnimationId = null;
     }
     confettiParticles.length = 0;
+    floatingNameTokens.length = 0;
+    processedTappers.clear();
     updateDisplay(data);
 
     if (isAudioStarted) {
