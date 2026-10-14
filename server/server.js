@@ -184,7 +184,6 @@ io.on('connection', (socket) => {
 
   // Client batch clicks event (sent every 100ms by client)
   socket.on('batch_clicks', (data) => {
-    if (gameState.isGameStarted) return; // Ignore if already reached 100%
     if (gameState.eventStatus === 'STANDBY' || gameState.eventStatus === 'PAUSED') return;
 
     const count = parseInt(data?.count, 10);
@@ -227,6 +226,12 @@ io.on('connection', (socket) => {
     gameState.rawClicksTotal += validCount;
     gameState.totalBatchesReceived++;
     recordClicks(validCount);
+
+    // If ceremony is already unlocked (100%):
+    // Allow players to continue playing and ranking on the leaderboard for fun!
+    if (gameState.isGameStarted) {
+      return;
+    }
 
     // Dynamic 67.5% Plateau Control Logic (Strict lock at 67.5% until President touches)
     const currentPct = (gameState.currentClicks / gameState.targetClicks) * 100;

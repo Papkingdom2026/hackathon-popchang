@@ -497,8 +497,10 @@ document.addEventListener('DOMContentLoaded', () => {
       headerPercentEl.textContent = `${pct.toFixed(1)}%`;
       updateRetroSegments(pct);
 
-      if (currentEventStatus === 'PLATEAU_67' || (pct >= 67.0 && !data.isGameStarted)) {
+      if ((currentEventStatus === 'PLATEAU_67' || pct >= 67.5) && !data.isGameStarted) {
         stage67Modal.classList.remove('hidden');
+      } else {
+        stage67Modal.classList.add('hidden');
       }
     }
 
@@ -518,11 +520,12 @@ document.addEventListener('DOMContentLoaded', () => {
 
   function triggerGameStart() {
     isGameUnlocked = true;
+    currentEventStatus = 'FINISHED';
     stage67Modal.classList.add('hidden');
     standbyModal.classList.add('hidden');
     if (gameStartModal) gameStartModal.classList.add('hidden');
 
-    // Smooth whiteout transition (no GAME START popup)
+    // Smooth whiteout transition on mobile, then fade back so player can continue playing for fun!
     let whiteout = document.getElementById('whiteoutOverlay');
     if (!whiteout) {
       whiteout = document.createElement('div');
@@ -530,8 +533,14 @@ document.addEventListener('DOMContentLoaded', () => {
       whiteout.style.cssText = 'position:fixed;inset:0;background:#ffffff;z-index:9999;opacity:0;transition:opacity 0.8s ease-in-out;pointer-events:none;';
       document.body.appendChild(whiteout);
     }
+    whiteout.classList.remove('hidden');
     setTimeout(() => {
       whiteout.style.opacity = '1';
+      // Fade out after 4 seconds so players can continue playing for fun
+      setTimeout(() => {
+        whiteout.style.opacity = '0';
+        setTimeout(() => whiteout.classList.add('hidden'), 800);
+      }, 4000);
     }, 150);
 
     if ('vibrate' in navigator) {
