@@ -107,6 +107,40 @@
            class="mascot-img-layer hidden"
            onerror="this.onerror=null; this.src='assets/mascot_open.jpg'">
     </div>
+
+    <!-- STAGE NOTICE: DIRECT OVERLAY ON ELEPHANT MASCOT (INTRUSIVE ATTENTION ALERT) -->
+    <div id="stage67Modal" class="absolute inset-0 z-45 flex flex-col items-center justify-center p-3 text-center pointer-events-none hidden">
+      <div class="w-full max-w-xs sm:max-w-sm rounded-2xl p-5 bg-[#010926]/90 backdrop-blur-md border-2 border-[#ffe600] shadow-[0_0_50px_rgba(255,230,0,0.7)] flex flex-col items-center gap-3 relative overflow-hidden animate-pulse-gentle">
+        <!-- Top alert ribbon -->
+        <div class="w-full py-1 bg-[#ffe600] text-black font-orbitron font-black text-[11px] tracking-widest rounded-md flex items-center justify-center gap-1.5 shadow-sm">
+          <span>⚠️ ATTENTION : SYSTEM OVERRIDE ⚠️</span>
+        </div>
+
+        <div class="text-4xl animate-bounce mt-1">
+          👀 ⬆️ 🖥️
+        </div>
+
+        <div>
+          <h2 class="font-orbitron text-xl sm:text-2xl font-black text-[#ffe600] neon-glow-yellow uppercase tracking-wide leading-tight">
+            หยุดกดชั่วคราว!
+          </h2>
+        </div>
+
+        <!-- Main Instruction Card (Huge & High Contrast) -->
+        <div class="w-full p-3.5 rounded-xl bg-black/75 border border-[#00f0ff]/50 shadow-[0_0_20px_rgba(0,240,255,0.35)] space-y-1.5">
+          <p class="text-lg sm:text-xl font-black text-white leading-snug">
+            ได้โปรดดูที่จอบนหอประชุม
+          </p>
+          <p class="text-xs text-[#00ff66] font-medium">
+            เพื่อส่งพลังงานก้อนสุดท้ายพร้อมกันบนเวที
+          </p>
+        </div>
+
+        <div class="text-[11px] font-mono-tech text-gray-300">
+          ✦ เมื่อพิธีเปิดเสร็จสิ้น สามารถกลับมากดเล่นต่อได้ ✦
+        </div>
+      </div>
+    </div>
   </main>
 
   <!-- BOTTOM HINT (MINIMAL) -->
@@ -153,51 +187,7 @@
     </div>
   </div>
 
-  <!-- STAGE 67% NOTICE OVERLAY (URGENT ATTENTION BROADCAST TO LOOK AT AUDITORIUM SCREEN) -->
-  <div id="stage67Modal" class="fixed inset-0 z-45 flex flex-col items-center justify-center p-5 text-center bg-black/90 backdrop-blur-lg hidden">
-    <!-- Pulsing Hazard Warning Badge -->
-    <div class="w-full max-w-sm rounded-2xl p-6 bg-gradient-to-b from-[#1a0a00]/95 via-[#020926]/95 to-black/95 border-2 border-[#ffe600] shadow-[0_0_50px_rgba(255,230,0,0.6)] flex flex-col items-center gap-3.5 relative overflow-hidden">
-      
-      <!-- Flashing top alert ribbon -->
-      <div class="absolute top-0 inset-x-0 py-1 bg-[#ffe600] text-black font-orbitron font-black text-[11px] tracking-widest animate-pulse flex items-center justify-center gap-2">
-        <span>⚠️ ATTENTION : SYSTEM OVERRIDE ⚠️</span>
-      </div>
 
-      <!-- Animated Alert Icon -->
-      <div class="text-5xl mt-3 animate-bounce">
-        👀
-      </div>
-
-      <!-- Headline -->
-      <div>
-        <h2 class="font-orbitron text-xl sm:text-2xl font-black text-[#ffe600] neon-glow-yellow uppercase tracking-wide leading-tight">
-          หยุดกดบนมือถือชั่วคราว!
-        </h2>
-        <div class="text-xs font-mono-tech text-[#00f0ff] mt-1 font-bold">
-          [ พลังงานถูกล็อคที่ 67.5% เรียบร้อยแล้ว ]
-        </div>
-      </div>
-
-      <!-- Main Instruction Card (Huge & Bold) -->
-      <div class="w-full p-4 rounded-xl bg-black/70 border border-[#00f0ff]/50 shadow-[0_0_20px_rgba(0,240,255,0.35)] space-y-2">
-        <div class="text-3xl animate-pulse">
-          ⬆️ 🖥️ ⬆️
-        </div>
-        <p class="text-base sm:text-lg font-black text-white leading-relaxed">
-          กรุณาเงยหน้ามองที่<br>
-          <span class="text-[#00ff66] text-lg sm:text-xl underline decoration-[#00ff66] underline-offset-4">จอใหญ่บนเวทีหอประชุม</span>
-        </p>
-        <p class="text-xs text-gray-300 font-medium">
-          ประธานทั้ง 2 ท่านกำลังจะส่งพลังงาน<br>
-          <strong class="text-[#ffe600]">ก้อนสุดท้าย 100% พร้อมกัน!</strong>
-        </p>
-      </div>
-
-      <div class="text-[11px] font-mono-tech text-gray-400 animate-pulse">
-        ✦ เมื่อพิธีเปิดเสร็จสิ้น สามารถกลับมากดเล่นต่อได้ ✦
-      </div>
-    </div>
-  </div>
 
   <!-- CELEBRATION MODAL ON GAME START -->
   <div id="gameStartModal" class="fixed inset-0 bg-[#010626]/95 z-50 flex flex-col items-center justify-center p-6 text-center hidden">
