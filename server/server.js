@@ -228,37 +228,32 @@ io.on('connection', (socket) => {
     gameState.totalBatchesReceived++;
     recordClicks(validCount);
 
-    // Dynamic 67% Plateau Control Logic (Slow Crawl 67.0% -> 67.9%)
+    // Dynamic 67.5% Plateau Control Logic (Strict lock at 67.5% until President touches)
     const currentPct = (gameState.currentClicks / gameState.targetClicks) * 100;
-    const cap67_0 = gameState.targetClicks * 0.670;
-    const cap67_9 = gameState.targetClicks * 0.679;
+    const cap67_5 = gameState.targetClicks * 0.675;
 
     // If President has NOT triggered yet:
     if (!gameState.presidentTriggered) {
-      if (currentPct >= 67.0) {
-        // We are at or above 67.0%: Enter 67% Plateau!
+      if (currentPct >= 67.5) {
+        // We are at or above 67.5%: Enter 67% Plateau and freeze progress!
+        gameState.currentClicks = cap67_5;
         gameState.eventStatus = 'PLATEAU_67';
         if (!gameState.stage67Triggered) {
           gameState.stage67Triggered = true;
-          console.log('🔒 [STAGE 67%] 67.0% reached! Triggering floating 67 numbers and Plateau.');
+          console.log('🔒 [STAGE 67%] 67.5% reached! Triggering floating 67 numbers and locking energy.');
           io.emit('stage_67_reached', { timestamp: Date.now() });
         }
-
-        // Crawl slowly from 67.0% to 67.9% maximum:
-        // Gives the feeling of struggling to reach 70%, but can never reach 70% without presidents!
-        if (!gameState.isFrozen && gameState.currentClicks < cap67_9) {
-          gameState.currentClicks = Math.min(cap67_9, gameState.currentClicks + Math.max(0.03, validCount * 0.012));
-        }
+        // Between 67.5% and 100%, user tapping does NOT increase energy, prompting focus on stage!
       } else {
-        // Below 67%: Normal advancement, capped strictly at 67.0%
+        // Below 67.5%: Normal advancement, capped strictly at 67.5%
         if (!gameState.isFrozen) {
           const effectivePoints = validCount * gameState.clickMultiplier;
-          if (gameState.currentClicks + effectivePoints >= cap67_0) {
-            gameState.currentClicks = cap67_0;
+          if (gameState.currentClicks + effectivePoints >= cap67_5) {
+            gameState.currentClicks = cap67_5;
             gameState.eventStatus = 'PLATEAU_67';
             if (!gameState.stage67Triggered) {
               gameState.stage67Triggered = true;
-              console.log('🔒 [STAGE 67%] 67.0% reached! Triggering floating 67 numbers and Plateau.');
+              console.log('🔒 [STAGE 67%] 67.5% reached! Triggering floating 67 numbers and locking energy.');
               io.emit('stage_67_reached', { timestamp: Date.now() });
             }
           } else {

@@ -201,23 +201,23 @@ class HackathonAudioEngine {
   }
 
   /* =========================================================================
-   * 3.0 PRESIDENTIAL BUTTON UNLOCK NOTIFICATION (When 67.5% button appears)
-   * Crisp, majestic, crystal cyber notification chime (C5 -> G5 -> C6 -> E6)
+   * 3.2 PRESIDENT BUTTON APPEAR ALERT SOUND
+   * Heroic cyber chime tone signaling presidential button appearance
    * ========================================================================= */
-  playUnlockNotification() {
+  playPresidentAlert() {
     if (this.isMuted) return;
     this.init();
     if (!this.ctx) return;
 
     const t = this.ctx.currentTime;
-    const tones = [
-      { freq: 523.25, time: 0.00, dur: 0.35, vol: 0.35 }, // C5
-      { freq: 783.99, time: 0.12, dur: 0.40, vol: 0.40 }, // G5
-      { freq: 1046.50, time: 0.24, dur: 0.65, vol: 0.45 }, // C6
-      { freq: 1318.51, time: 0.36, dur: 0.90, vol: 0.50 }  // E6
+    const notes = [
+      { freq: 440.00, time: 0.00, dur: 0.14 }, // A4
+      { freq: 554.37, time: 0.10, dur: 0.16 }, // C#5
+      { freq: 659.25, time: 0.20, dur: 0.18 }, // E5
+      { freq: 880.00, time: 0.30, dur: 0.55 }, // A5 (heroic high chime)
     ];
 
-    tones.forEach((n) => {
+    notes.forEach((n) => {
       const noteTime = t + n.time;
       const osc = this.ctx.createOscillator();
       const gain = this.ctx.createGain();
@@ -226,7 +226,7 @@ class HackathonAudioEngine {
       osc.frequency.setValueAtTime(n.freq, noteTime);
 
       gain.gain.setValueAtTime(0, noteTime);
-      gain.gain.linearRampToValueAtTime(n.vol, noteTime + 0.02);
+      gain.gain.linearRampToValueAtTime(0.35, noteTime + 0.02);
       gain.gain.exponentialRampToValueAtTime(0.001, noteTime + n.dur);
 
       osc.connect(gain);

@@ -344,8 +344,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // Primary Click / Tap Handler (Zero Layout Thrashing & Low Latency)
   function handleTap(x, y) {
-    if (isGameUnlocked) return;
-
     if (currentEventStatus === 'STANDBY') {
       standbyModal.classList.remove('hidden');
       return;
@@ -354,35 +352,41 @@ document.addEventListener('DOMContentLoaded', () => {
     // 1. Audio pop SFX
     window.hackathonAudio.playPop();
 
-    // 2. Increment Counters
-    personalTotalClicks++;
-    pendingBatchClicks++;
-    recordPersonalClick();
-    myClicksEl.textContent = personalTotalClicks.toLocaleString();
-
-    // 3. Tactile Feedback (Haptic Vibration)
+    // 2. Tactile Feedback (Haptic Vibration)
     if ('vibrate' in navigator) {
       try {
         navigator.vibrate(10);
       } catch (e) {}
     }
 
-    // 4. Mascot State Transition (Mouth Open)
+    // 3. Mascot State Transition (Mouth Open) & Trunk Water
     imgClosed.classList.add('hidden');
     imgOpen.classList.remove('hidden');
     tapArea.classList.add('active-tap');
 
-    // 5. Fast Canvas Water Droplets & Floating +1
+    // 4. Fast Canvas Water Droplets & Floating +1
     shootTrunkWater();
     createParticle(x, y);
 
-    // 6. Reset mouth state after 75ms
+    // 5. Reset mouth state after 75ms
     if (closeMouthTimeout) clearTimeout(closeMouthTimeout);
     closeMouthTimeout = setTimeout(() => {
       imgOpen.classList.add('hidden');
       imgClosed.classList.remove('hidden');
       tapArea.classList.remove('active-tap');
     }, 75);
+
+    // At 67.5% (Stage 67 Plateau): Keep mascot playful, but do NOT advance numbers!
+    // This guides all players to look up at the stage as requested.
+    if (currentEventStatus === 'PLATEAU_67') {
+      return;
+    }
+
+    // 6. Increment Counters (when running normally or after 100%)
+    personalTotalClicks++;
+    pendingBatchClicks++;
+    recordPersonalClick();
+    myClicksEl.textContent = personalTotalClicks.toLocaleString();
   }
 
   // Touch Event Listeners (Support Multi-touch)

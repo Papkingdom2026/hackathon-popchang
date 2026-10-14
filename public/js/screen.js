@@ -331,13 +331,11 @@ document.addEventListener('DOMContentLoaded', () => {
   function checkPresidentButton(percentage) {
     if (percentage >= 67.4 && !presidentRevealedLocal && !isGameUnlocked) {
       presidentRevealedLocal = true;
-      presidentTouchArea.classList.remove('opacity-0', 'pointer-events-none');
-      presidentTouchArea.classList.add('opacity-100', 'pointer-events-auto');
+      console.log('👑 [PRESIDENT BUTTON REVEALED] Playing alert sound...');
+      window.hackathonAudio.playPresidentAlert();
 
-      // Play dramatic crystal notification chime
-      if (window.hackathonAudio) {
-        window.hackathonAudio.playUnlockNotification();
-      }
+      presidentTouchArea.classList.remove('opacity-0', 'pointer-events-none', 'translate-y-2', 'scale-95');
+      presidentTouchArea.classList.add('opacity-100', 'pointer-events-auto', 'translate-y-0', 'scale-100');
     }
   }
 
@@ -659,8 +657,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Reset overlay & presidential button states
     if (presidentTouchArea) {
-      presidentTouchArea.classList.remove('opacity-100', 'pointer-events-auto');
-      presidentTouchArea.classList.add('opacity-0', 'pointer-events-none');
+      presidentTouchArea.classList.add('opacity-0', 'pointer-events-none', 'translate-y-2', 'scale-95');
+      presidentTouchArea.classList.remove('opacity-100', 'pointer-events-auto', 'translate-y-0', 'scale-100');
     }
     if (giant67Overlay) {
       giant67Overlay.classList.remove('opacity-100');
@@ -685,5 +683,9 @@ document.addEventListener('DOMContentLoaded', () => {
     floatingNameTokens.length = 0;
     processedTappers.clear();
     updateDisplay(data);
+
+    if (isAudioStarted) {
+      window.hackathonAudio.startBGM();
+    }
   });
 });
