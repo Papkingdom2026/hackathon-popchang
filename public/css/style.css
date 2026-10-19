@@ -269,36 +269,44 @@ body.scrollable-body {
  * LIQUID WAVE FILL FOR PROJECTOR SCREEN (WIDE 1024x491 BANNER STAGE)
  * ========================================================================= */
 :root {
-  --stage-width: 1040px;
-  --stage-height: 480px;
+  --stage-width: 860px;
+  --stage-height: 380px;
 }
 
 @media (max-height: 900px) {
   :root {
-    --stage-width: 920px;
-    --stage-height: 420px;
+    --stage-width: 800px;
+    --stage-height: 340px;
   }
 }
 
 @media (max-width: 1100px) {
   :root {
-    --stage-width: 92vw;
-    --stage-height: 44vw;
+    --stage-width: 88vw;
+    --stage-height: 39vw;
   }
 }
 
 .liquid-art-stage {
   position: relative;
   width: var(--stage-width);
-  max-width: 94vw;
+  max-width: 92vw;
   height: var(--stage-height);
-  max-height: 56vh;
+  max-height: 46vh;
   margin: 0 auto;
-  border-radius: 24px;
+  border-radius: 20px;
   overflow: hidden;
-  box-shadow: 0 0 50px rgba(0, 240, 255, 0.35), inset 0 0 40px rgba(0, 0, 0, 0.85);
+  box-shadow: 0 0 45px rgba(0, 240, 255, 0.3), inset 0 0 35px rgba(0, 0, 0, 0.85);
   border: 2px solid rgba(0, 240, 255, 0.5);
   background: radial-gradient(ellipse at 50% 60%, #031548 0%, #010826 100%);
+}
+
+/* Fullscreen Pure Whiteout on 100% Finish */
+#whiteOutOverlay.whiteout-visible {
+  opacity: 1 !important;
+  pointer-events: auto !important;
+  background-color: #ffffff !important;
+  transition: opacity 0.8s ease-in-out !important;
 }
 
 /* Base unrevealed layer: Dark & Blurry silhouette (People cannot recognize or read yet) */

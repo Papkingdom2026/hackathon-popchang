@@ -292,8 +292,8 @@ io.on('connection', (socket) => {
   });
 
   // Presidential Touch / Dual Screen Touch Event
-  function triggerPresidentialSurge() {
-    if (gameState.isGameStarted || gameState.presidentTriggered) return;
+  function triggerPresidentialSurge(force = false) {
+    if (!force && (gameState.isGameStarted || gameState.presidentTriggered)) return;
     gameState.presidentTriggered = true;
     gameState.isFrozen = false;
     gameState.eventStatus = 'RUNNING';
@@ -353,7 +353,9 @@ io.on('connection', (socket) => {
   // Admin Controls: Force 100% Start (Instant Climax)
   socket.on('admin_force_start', () => {
     console.log('🚀 [ADMIN] admin_force_start received! Triggering 100% surge...');
-    triggerPresidentialSurge();
+    gameState.isGameStarted = false;
+    gameState.presidentTriggered = false;
+    triggerPresidentialSurge(true);
   });
 
   // Admin Controls: Start / Pause Event

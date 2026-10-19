@@ -630,11 +630,17 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // 5. Directly transition into pure full-screen whiteout (NO GAME START MODAL as requested!)
     const tWhiteIn = setTimeout(() => {
-      whiteOutOverlay.classList.add('whiteout-visible');
+      whiteOutOverlay.classList.remove('opacity-0', 'pointer-events-none');
+      whiteOutOverlay.classList.add('opacity-100', 'whiteout-visible');
+      whiteOutOverlay.style.opacity = '1';
+      whiteOutOverlay.style.pointerEvents = 'auto';
 
       // Hold pure white screen for 10 seconds ("ค้างไว้ 10 วิเลย แล้วก็มาหน้าปกติ")
       const tWhiteHold = setTimeout(() => {
-        whiteOutOverlay.classList.remove('whiteout-visible');
+        whiteOutOverlay.classList.remove('opacity-100', 'whiteout-visible');
+        whiteOutOverlay.classList.add('opacity-0', 'pointer-events-none');
+        whiteOutOverlay.style.opacity = '0';
+        whiteOutOverlay.style.pointerEvents = 'none';
 
         // Stop confetti
         setTimeout(() => {
@@ -749,7 +755,10 @@ document.addEventListener('DOMContentLoaded', () => {
     gameStartOverlay.style.opacity = '1';
     gameStartOverlay.style.pointerEvents = 'none';
 
-    whiteOutOverlay.classList.remove('whiteout-visible');
+    whiteOutOverlay.classList.remove('opacity-100', 'whiteout-visible');
+    whiteOutOverlay.classList.add('opacity-0', 'pointer-events-none');
+    whiteOutOverlay.style.opacity = '0';
+    whiteOutOverlay.style.pointerEvents = 'none';
     doorSplitStage.classList.remove('door-open-active');
     doorSplitStage.classList.add('hidden');
     doorWhiteLight.classList.remove('door-white-flare');
