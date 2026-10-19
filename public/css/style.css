@@ -1,5 +1,5 @@
 /* Cyberpunk & Retro Minimal Theme - Game Programming Hackathon 2026 @PCSHS_PHITSANULOK */
-@import url('https://fonts.googleapis.com/css2?family=Chakra+Petch:ital,wght@0,400;0,600;0,700;1,700&family=Orbitron:wght@500;700;900&family=Share+Tech+Mono&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@400;600;700&family=Kanit:wght@300;400;500;600;700;800&family=Orbitron:wght@500;700;900&family=Prompt:ital,wght@0,300;0,400;0,500;0,600;0,700;1,600&family=Share+Tech+Mono&display=swap');
 
 :root {
   --neon-cyan: #00f0ff;
@@ -21,13 +21,50 @@
 }
 
 body {
-  font-family: 'Chakra Petch', sans-serif;
+  font-family: 'Prompt', 'Kanit', 'Chakra Petch', sans-serif;
   background-color: var(--bg-deep-blue);
   background: var(--bg-gradient);
   background-attachment: fixed;
   color: #ffffff;
   overflow: hidden;
   min-height: 100vh;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Allow vertical scroll for Admin and pages that need it */
+body.admin-body,
+body.scrollable-body {
+  overflow-y: auto !important;
+  overflow-x: hidden !important;
+  min-height: 100vh;
+  height: auto !important;
+}
+
+/* Custom Cyberpunk Scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+::-webkit-scrollbar-track {
+  background: #01082d;
+}
+::-webkit-scrollbar-thumb {
+  background: #00f0ff;
+  border-radius: 4px;
+  box-shadow: 0 0 8px rgba(0, 240, 255, 0.5);
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #ffe600;
+  box-shadow: 0 0 10px rgba(255, 230, 0, 0.7);
+}
+
+.font-prompt {
+  font-family: 'Prompt', sans-serif;
+}
+
+.font-kanit {
+  font-family: 'Kanit', sans-serif;
 }
 
 .font-orbitron {

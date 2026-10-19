@@ -46,9 +46,14 @@ document.addEventListener('DOMContentLoaded', () => {
   const leaderboardList = document.getElementById('leaderboardList');
   const btnToggleLeaderboard = document.getElementById('btnToggleLeaderboard');
   const btnCloseLeaderboard = document.getElementById('btnCloseLeaderboard');
+  const standbyLobbyOverlay = document.getElementById('standbyLobbyOverlay');
+  const standbyPlayersContainer = document.getElementById('standbyPlayersContainer');
+  const lobbyConnectedCount = document.getElementById('lobbyConnectedCount');
+  const energyStatusMain = document.getElementById('energyStatusMain');
 
   let isAudioStarted = false;
   let isGameUnlocked = false;
+  let isLeaderboardOpen = false;
   let currentPercentageVal = 0;
   let finaleTimers = [];
   let stage67TriggeredLocal = false;
@@ -237,22 +242,66 @@ document.addEventListener('DOMContentLoaded', () => {
   renderFloatingNames();
 
   // Leaderboard & 67% Controller
+  function toggleLeaderboard(forceState) {
+    isLeaderboardOpen = typeof forceState === 'boolean' ? forceState : !isLeaderboardOpen;
+    if (isLeaderboardOpen) {
+      leaderboardPanel.classList.remove('hidden');
+      if (btnToggleLeaderboard) {
+        btnToggleLeaderboard.classList.add('bg-[#ffe600]/25', 'border-[#ffe600]', 'text-[#ffe600]');
+      }
+    } else {
+      leaderboardPanel.classList.add('hidden');
+      if (btnToggleLeaderboard) {
+        btnToggleLeaderboard.classList.remove('bg-[#ffe600]/25', 'border-[#ffe600]', 'text-[#ffe600]');
+      }
+    }
+  }
+
   if (btnToggleLeaderboard) {
     btnToggleLeaderboard.addEventListener('click', () => {
-      leaderboardPanel.classList.toggle('hidden');
+      toggleLeaderboard();
     });
   }
 
   if (btnCloseLeaderboard) {
     btnCloseLeaderboard.addEventListener('click', () => {
-      leaderboardPanel.classList.add('hidden');
+      toggleLeaderboard(false);
     });
   }
 
   function escapeHtml(str) {
     const div = document.createElement('div');
-    div.textContent = str;
+    div.textContent = str || '';
     return div.innerHTML;
+  }
+
+  // Standby Lobby: Displays Connected Players Inside Art Stage Before Start
+  function renderStandbyLobby(playersList) {
+    if (!standbyPlayersContainer) return;
+    if (!playersList || playersList.length === 0) {
+      standbyPlayersContainer.innerHTML = `
+        <div class="text-xs font-mono-tech text-gray-500 py-6 animate-pulse">
+          รอผู้เล่นสแกน QR Code เพื่อเชื่อมต่อ...
+        </div>
+      `;
+      if (lobbyConnectedCount) lobbyConnectedCount.textContent = '0';
+      return;
+    }
+
+    if (lobbyConnectedCount) {
+      lobbyConnectedCount.textContent = playersList.length;
+    }
+
+    let html = '';
+    playersList.forEach((p) => {
+      html += `
+        <div class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-[#00f0ff]/10 border border-[#00f0ff]/40 shadow-[0_0_12px_rgba(0,240,255,0.2)] text-xs text-white font-prompt transform hover:scale-105 transition-all">
+          <span class="w-2 h-2 rounded-full bg-[#00ff66] animate-pulse"></span>
+          <span class="font-medium text-gray-100">${escapeHtml(p.name)}</span>
+        </div>
+      `;
+    });
+    standbyPlayersContainer.innerHTML = html;
   }
 
   function renderLeaderboard(playersList) {
@@ -405,6 +454,37 @@ document.addEventListener('DOMContentLoaded', () => {
     }
     if (percentage >= 67.4 || data.stage67Triggered) {
       checkPresidentButton(percentage);
+    }
+
+    // Standby Lobby Visibility Control (Shows connected players in center box before start)
+    if (standbyLobbyOverlay) {
+      if (data.eventStatus === 'STANDBY' && percentage < 0.5 && !data.isGameStarted) {
+        standbyLobbyOverlay.classList.remove('opacity-0', 'pointer-events-none');
+        standbyLobbyOverlay.classList.add('opacity-100');
+      } else {
+        standbyLobbyOverlay.classList.remove('opacity-100');
+        standbyLobbyOverlay.classList.add('opacity-0', 'pointer-events-none');
+      }
+    }
+
+    if (data.connectedPlayers) {
+      renderStandbyLobby(data.connectedPlayers);
+    }
+
+    if (energyStatusMain) {
+      if (data.eventStatus === 'STANDBY') {
+        energyStatusMain.textContent = 'STANDBY MODE';
+        energyStatusMain.className = 'font-orbitron text-lg lg:text-xl font-bold text-[#ffe600] animate-pulse';
+      } else if (data.eventStatus === 'PLATEAU_67') {
+        energyStatusMain.textContent = 'STAGE 67% (AWAITING TOUCH)';
+        energyStatusMain.className = 'font-orbitron text-lg lg:text-xl font-bold text-[#ffe600] neon-glow-yellow animate-pulse';
+      } else if (data.isGameStarted) {
+        energyStatusMain.textContent = 'CEREMONY UNLOCKED 100%';
+        energyStatusMain.className = 'font-orbitron text-lg lg:text-xl font-bold text-[#00ff66]';
+      } else {
+        energyStatusMain.textContent = 'SYSTEM CHARGING';
+        energyStatusMain.className = 'font-orbitron text-lg lg:text-xl font-bold text-[#00f0ff]';
+      }
     }
 
     // Leaderboard Update
@@ -686,6 +766,18 @@ document.addEventListener('DOMContentLoaded', () => {
 
     if (isAudioStarted) {
       window.hackathonAudio.startBGM();
+    }
+  });
+
+  socket.on('player_registered', (data) => {
+    if (data.connectedPlayers) {
+      renderStandbyLobby(data.connectedPlayers);
+    }
+    if (data.topPlayers) {
+      renderLeaderboard(data.topPlayers);
+    }
+    if (data.player && data.player.name) {
+      spawnFloatingName(data.player.name);
     }
   });
 });

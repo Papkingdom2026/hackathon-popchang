@@ -6,6 +6,11 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="theme-color" content="#010626">
   
+  <!-- Google Fonts Preconnect -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@400;600;700&family=Kanit:wght@300;400;500;600;700;800&family=Orbitron:wght@500;700;900&family=Prompt:ital,wght@0,300;0,400;0,500;0,600;0,700;1,600&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+
   <!-- Tailwind CSS CDN -->
   <script src="https://cdn.tailwindcss.com"></script>
   
@@ -98,6 +103,50 @@
     </div>
   </div>
 
+  <!-- TOP CONDUIT STAGE: RETRO SEGMENTED BAR & TRANSFER RATE (ELEVATED ABOVE ARTWORK SO PEOPLE CANNOT BLOCK IT) -->
+  <section id="energyConduitStage" class="w-full max-w-5xl mx-auto z-15 relative mt-1.5 px-3">
+    <div class="cyber-panel px-5 py-2.5 bg-[#020a26]/90 border border-[#00f0ff]/35 shadow-[0_0_20px_rgba(0,240,255,0.2)]">
+      
+      <!-- Stats Header Above Bar -->
+      <div class="flex items-center justify-between mb-1 font-mono-tech">
+        <div class="flex items-baseline gap-2">
+          <span class="text-xs text-gray-400">ENERGY STATUS:</span>
+          <span id="energyStatusMain" class="font-orbitron text-lg lg:text-xl font-bold text-[#00f0ff]">
+            SYSTEM CHARGING
+          </span>
+        </div>
+
+        <div class="flex items-center gap-6 font-mono-tech">
+          <!-- CPS Transfer Rate -->
+          <div class="flex items-center gap-2">
+            <span class="text-xs text-gray-400">TRANSFER RATE:</span>
+            <span id="screenCPS" class="font-orbitron text-lg lg:text-xl font-bold text-[#ffe600]">0</span>
+            <span class="text-xs text-gray-400">CLICKS/SEC</span>
+          </div>
+
+          <!-- Percentage -->
+          <div class="font-orbitron text-2xl lg:text-3xl font-black text-[#ffe600] neon-glow-yellow">
+            <span id="screenPercentage">0.0</span>%
+          </div>
+        </div>
+      </div>
+
+      <!-- Retro Segmented Progress Bar (36 segments on projector screen) -->
+      <div id="screenRetroBar" class="retro-segmented-container !h-6 mb-1">
+        <!-- Segments dynamically rendered via JS -->
+      </div>
+
+      <!-- Milestone markers -->
+      <div class="flex justify-between items-center text-[10px] font-mono-tech text-gray-400 px-1">
+        <span>0% [STANDBY]</span>
+        <span>25% [SYNCHRONIZED]</span>
+        <span>50% [HALF CAPACITY]</span>
+        <span>75% [OVERCLOCKING]</span>
+        <span class="text-[#ffe600] font-bold">100% [GAME START!]</span>
+      </div>
+    </div>
+  </section>
+
   <!-- CENTER STAGE: LIQUID WAVE FILL ARTWORK (REVEALS ARTWORK & FONTS GRADUALLY) -->
   <main id="centerStage" class="flex-1 flex flex-col items-center justify-center relative z-10 my-1">
     
@@ -149,6 +198,42 @@
                class="art-active-layer">
         </div>
 
+        <!-- Standby Lobby: Displays Incoming Connected Players Before Game Starts -->
+        <div id="standbyLobbyOverlay" class="absolute inset-0 z-15 flex flex-col items-center justify-between p-4 sm:p-6 bg-gradient-to-b from-[#010926]/95 via-[#010626]/90 to-[#00041a]/95 backdrop-blur-md rounded-2xl border-2 border-[#00f0ff]/40 shadow-[0_0_40px_rgba(0,240,255,0.25)] transition-all duration-700">
+          
+          <!-- Lobby Header -->
+          <div class="text-center space-y-1">
+            <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#00f0ff]/10 border border-[#00f0ff]/30 text-xs font-mono-tech text-[#00f0ff]">
+              <span class="w-2 h-2 rounded-full bg-[#00ff66] animate-ping"></span>
+              <span>LIVE AGENTS CONNECTING TO MAINFRAME</span>
+            </div>
+            <h3 class="font-orbitron text-base sm:text-xl font-black text-[#ffe600] neon-glow-yellow">
+              ผู้ส่งพลังงานที่กำลังเข้าสู่ระบบ
+            </h3>
+            <p class="text-xs text-gray-300 font-prompt">
+              สแกน QR Code เพื่อเชื่อมต่อและบันทึกชื่อขึ้นจอใหญ่
+            </p>
+          </div>
+
+          <!-- Dynamic Cloud / Grid of Connected Players -->
+          <div id="standbyPlayersContainer" class="w-full flex-1 my-3 overflow-hidden flex flex-wrap content-center justify-center gap-2 p-2">
+            <div class="text-xs font-mono-tech text-gray-500 py-6 animate-pulse">
+              รอผู้เล่นสแกน QR Code เพื่อเชื่อมต่อ...
+            </div>
+          </div>
+
+          <!-- Lobby Footer Count -->
+          <div class="flex items-center justify-between w-full pt-2 border-t border-[#00f0ff]/20 text-xs font-mono-tech text-gray-400">
+            <span class="flex items-center gap-1.5 text-[#00ff66]">
+              <span class="w-2 h-2 rounded-full bg-[#00ff66]"></span>
+              STATUS: WAITING FOR START SIGNAL
+            </span>
+            <span>
+              เชื่อมต่อแล้ว: <strong id="lobbyConnectedCount" class="text-base text-[#00f0ff] font-orbitron font-bold">0</strong> คน
+            </span>
+          </div>
+        </div>
+
         <!-- Floating Live Percentage Inside Artwork Stage -->
         <div class="absolute bottom-3 left-0 right-0 text-center z-10 pointer-events-none">
           <div class="inline-block px-5 py-1 rounded-full bg-black/80 border border-[#00f0ff]/50 backdrop-blur-md shadow-[0_0_20px_rgba(0,240,255,0.4)]">
@@ -178,63 +263,18 @@
     </div>
   </main>
 
-  <!-- BOTTOM STAGE: RETRO SEGMENTED BAR & TRANSFER RATE (NO TARGET NUMBERS REVEALED) -->
-  <footer id="bottomStage" class="w-full z-10 relative">
-    <div class="cyber-panel px-6 py-3">
-      
-      <!-- Stats Header Above Bar -->
-      <div class="flex items-center justify-between mb-1.5 font-mono-tech">
-        <div class="flex items-baseline gap-2">
-          <span class="text-xs text-gray-400">ENERGY STATUS:</span>
-          <span class="font-orbitron text-xl font-bold text-[#00f0ff]">
-            SYSTEM CHARGING
-          </span>
-        </div>
-
-        <div class="flex items-center gap-6 font-mono-tech">
-          <!-- CPS Transfer Rate -->
-          <div class="flex items-center gap-2">
-            <span class="text-xs text-gray-400">TRANSFER RATE:</span>
-            <span id="screenCPS" class="font-orbitron text-xl font-bold text-[#ffe600]">0</span>
-            <span class="text-xs text-gray-400">CLICKS/SEC</span>
-          </div>
-
-          <!-- Percentage -->
-          <div class="font-orbitron text-2xl lg:text-3xl font-black text-[#ffe600] neon-glow-yellow">
-            <span id="screenPercentage">0.0</span>%
-          </div>
-        </div>
-      </div>
-
-      <!-- Retro Segmented Progress Bar (36 segments on projector screen) -->
-      <div id="screenRetroBar" class="retro-segmented-container !h-7 mb-1.5">
-        <!-- Segments dynamically rendered via JS -->
-      </div>
-
-      <!-- Milestone markers -->
-      <div class="flex justify-between items-center text-[10px] font-mono-tech text-gray-400 px-1">
-        <span>0% [STANDBY]</span>
-        <span>25% [SYNCHRONIZED]</span>
-        <span>50% [HALF CAPACITY]</span>
-        <span>75% [OVERCLOCKING]</span>
-        <span class="text-[#ffe600] font-bold">100% [GAME START!]</span>
-      </div>
-    </div>
-  </footer>
-
-  <!-- TOP 20 HACKERS LEADERBOARD PANEL (COMPACT ON FAR RIGHT, HIDDEN BY DEFAULT) -->
-  <div id="leaderboardPanel" class="fixed top-16 right-3 z-40 w-60 md:w-64 max-w-[260px] cyber-panel p-3 flex flex-col bg-[#01082d]/95 backdrop-blur-md border border-[#00f0ff]/30 shadow-[0_0_25px_rgba(0,240,255,0.25)] transition-all duration-300 hidden">
+  <!-- TOP 20 HACKERS LEADERBOARD PANEL (DOCKED ON RIGHT SIDE, TOGGLEABLE) -->
+  <div id="leaderboardPanel" class="fixed top-24 right-4 z-40 w-64 md:w-72 max-w-[280px] cyber-panel p-3.5 flex flex-col bg-[#01082d]/95 backdrop-blur-md border border-[#00f0ff]/40 shadow-[0_0_35px_rgba(0,240,255,0.35)] transition-all duration-300 hidden">
     <div class="flex items-center justify-between pb-1.5 border-b border-[#00f0ff]/20 mb-2">
       <div class="flex items-center gap-1.5">
-        <span class="text-sm">🏆</span>
-        <span class="font-orbitron text-[11px] font-bold text-[#ffe600] tracking-wider">TOP 20 HACKERS</span>
+        <span class="text-base">🏆</span>
+        <span class="font-orbitron text-xs font-bold text-[#ffe600] tracking-wider">TOP 20 HACKERS</span>
       </div>
       <button id="btnCloseLeaderboard" class="text-xs text-gray-400 hover:text-white px-1 font-mono-tech">[✕]</button>
     </div>
-    <div id="leaderboardList" class="max-h-[55vh] overflow-y-auto space-y-1 pr-1 custom-scrollbar">
+    <div id="leaderboardList" class="max-h-[58vh] overflow-y-auto space-y-1.5 pr-1 custom-scrollbar">
       <div class="text-center text-xs text-gray-400 font-mono-tech py-6">
         กำลังรอผู้เข้าร่วมส่งพลังงาน...
-      </div>
     </div>
   </div>
 

@@ -116,11 +116,25 @@ function calculateCPS() {
 function getTopPlayers() {
   const now = Date.now();
   return Array.from(players.values())
-    .filter(p => p.clicks > 0 && (p.isOnline || (now - p.lastActive < 45000)))
-    .sort((a, b) => b.clicks - a.clicks)
+    .filter(p => p.name && p.name !== 'ผู้เข้าร่วม' && (p.isOnline || (now - p.lastActive < 60000)))
+    .sort((a, b) => {
+      if (b.clicks !== a.clicks) return b.clicks - a.clicks;
+      return (b.lastActive || 0) - (a.lastActive || 0);
+    })
     .slice(0, 20)
     .map((p, idx) => ({
       rank: idx + 1,
+      name: p.name,
+      clicks: p.clicks
+    }));
+}
+
+function getConnectedPlayers() {
+  return Array.from(players.values())
+    .filter(p => p.name && p.name !== 'ผู้เข้าร่วม' && p.isOnline)
+    .slice(-40)
+    .map(p => ({
+      id: p.id,
       name: p.name,
       clicks: p.clicks
     }));
@@ -151,7 +165,8 @@ io.on('connection', (socket) => {
     presidentTriggered: gameState.presidentTriggered,
     onlineUsers: connectedUsers,
     cps,
-    topPlayers: getTopPlayers()
+    topPlayers: getTopPlayers(),
+    connectedPlayers: getConnectedPlayers()
   });
 
   // Client updates player nickname and persistent playerId
@@ -180,6 +195,13 @@ io.on('connection', (socket) => {
 
     // Send back previous personal clicks so player can resume score!
     socket.emit('player_restored', { clicks: player.clicks, name: player.name });
+
+    // Broadcast live to Screen Lobby so new player's name pops up immediately!
+    io.emit('player_registered', {
+      player: { id: player.id, name: player.name, clicks: player.clicks },
+      connectedPlayers: getConnectedPlayers(),
+      topPlayers: getTopPlayers()
+    });
   });
 
   // Client batch clicks event (sent every 100ms by client)
@@ -493,6 +515,7 @@ setInterval(() => {
     stage67Triggered: gameState.stage67Triggered,
     presidentTriggered: gameState.presidentTriggered,
     topPlayers,
+    connectedPlayers: getConnectedPlayers(),
     recentTappers: recentTappers.slice(-10)
   });
 }, BROADCAST_INTERVAL_MS);
