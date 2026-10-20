@@ -119,18 +119,21 @@ document.addEventListener('DOMContentLoaded', () => {
   }
   loadQRCode();
 
-  btnToggleQR.addEventListener('click', () => {
+  btnToggleQR.addEventListener('click', (e) => {
+    e.stopPropagation();
     qrModal.classList.toggle('hidden');
   });
 
   if (btnToggleLeaderboard && leaderboardPanel) {
-    btnToggleLeaderboard.addEventListener('click', () => {
+    btnToggleLeaderboard.addEventListener('click', (e) => {
+      e.stopPropagation();
       leaderboardPanel.classList.toggle('hidden');
     });
   }
 
   if (btnCloseLeaderboard && leaderboardPanel) {
-    btnCloseLeaderboard.addEventListener('click', () => {
+    btnCloseLeaderboard.addEventListener('click', (e) => {
+      e.stopPropagation();
       leaderboardPanel.classList.add('hidden');
     });
   }
@@ -381,10 +384,19 @@ document.addEventListener('DOMContentLoaded', () => {
     if (percentage >= 67.4 && !presidentRevealedLocal && !isGameUnlocked) {
       presidentRevealedLocal = true;
       console.log('👑 [PRESIDENT BUTTON REVEALED] Playing alert sound...');
-      window.hackathonAudio.playPresidentAlert();
+      try {
+        if (window.hackathonAudio && window.hackathonAudio.playPresidentAlert) {
+          window.hackathonAudio.playPresidentAlert();
+        }
+      } catch (e) {}
 
-      presidentTouchArea.classList.remove('opacity-0', 'pointer-events-none', 'translate-y-2', 'scale-95');
-      presidentTouchArea.classList.add('opacity-100', 'pointer-events-auto', 'translate-y-0', 'scale-100');
+      if (presidentTouchArea) {
+        presidentTouchArea.classList.remove('hidden');
+        requestAnimationFrame(() => {
+          presidentTouchArea.classList.remove('opacity-0', 'pointer-events-none', 'translate-y-2', 'scale-95');
+          presidentTouchArea.classList.add('opacity-100', 'pointer-events-auto', 'translate-y-0', 'scale-100');
+        });
+      }
     }
   }
 
@@ -506,25 +518,19 @@ document.addEventListener('DOMContentLoaded', () => {
       });
     }
 
-    // Dynamic Subtext status
-    if (percentage < 25) {
-      energyStatusSubtext.textContent = '⚡ TRANSMITTING HACKER ENERGY... TAP TO CHARGE ⚡';
-      energyStatusSubtext.className = 'text-xs font-mono-tech tracking-wider text-[#00f0ff] uppercase px-4 py-1 rounded-full bg-[#00f0ff]/10 border border-[#00f0ff]/30';
-    } else if (percentage < 50) {
-      energyStatusSubtext.textContent = '🔋 POWER ACCELERATING... SENSORS SYNCHRONIZED 🔋';
-      energyStatusSubtext.className = 'text-xs font-mono-tech tracking-wider text-[#00ff66] uppercase px-4 py-1 rounded-full bg-[#00ff66]/10 border border-[#00ff66]/30';
-    } else if (percentage < 67) {
-      energyStatusSubtext.textContent = '🔥 HIGH VOLTAGE! SYSTEM OVERCLOCKING! 🔥';
-      energyStatusSubtext.className = 'text-xs font-mono-tech tracking-wider text-[#ff9e1f] uppercase px-4 py-1 rounded-full bg-[#ff9e1f]/15 border border-[#ff9e1f]/40 animate-pulse';
+    // Dynamic Subtext status - Clean & Minimal
+    if (percentage < 67) {
+      energyStatusSubtext.textContent = '⚡ สแกน QR Code เพื่อส่งพลังงาน ⚡';
+      energyStatusSubtext.className = 'text-xs sm:text-sm font-kanit font-semibold tracking-wider text-[#00f0ff] uppercase px-5 py-1.5 rounded-full bg-[#00f0ff]/10 border border-[#00f0ff]/30 shadow-[0_0_15px_rgba(0,240,255,0.25)]';
     } else if (percentage < 70) {
-      energyStatusSubtext.textContent = '✋ STAGE 67% REACHED : AWAITING PRESIDENTIAL OVERDRIVE ✋';
-      energyStatusSubtext.className = 'text-xs font-mono-tech tracking-wider text-[#ffe600] uppercase px-4 py-1 rounded-full bg-[#ffe600]/20 border border-[#ffe600]/50 animate-pulse font-bold';
+      energyStatusSubtext.textContent = '✋ STAGE 67% : ประธานแตะหน้าจอพร้อมกัน ✋';
+      energyStatusSubtext.className = 'text-xs sm:text-sm font-kanit font-bold tracking-wider text-[#ffe600] uppercase px-5 py-1.5 rounded-full bg-[#ffe600]/20 border border-[#ffe600]/50 animate-pulse font-bold';
     } else if (percentage < 100) {
-      energyStatusSubtext.textContent = '⚡ CRITICAL OVERDRIVE! MAXIMUM ENERGY SURGE INCOMING! ⚡';
-      energyStatusSubtext.className = 'text-xs font-mono-tech tracking-wider text-[#ff007f] uppercase px-4 py-1 rounded-full bg-[#ff007f]/20 border border-[#ff007f]/50 animate-pulse font-bold';
+      energyStatusSubtext.textContent = '⚡ กำลังพุ่งสู่ 100% สูงสุด! ⚡';
+      energyStatusSubtext.className = 'text-xs sm:text-sm font-kanit font-bold tracking-wider text-[#ff007f] uppercase px-5 py-1.5 rounded-full bg-[#ff007f]/20 border border-[#ff007f]/50 animate-pulse font-bold';
     }
 
-    if (data.isGameStarted && !isGameUnlocked) {
+    if ((data.isGameStarted || percentage >= 100) && !isGameUnlocked) {
       triggerGameStartFinale(data);
     }
   }
@@ -601,46 +607,66 @@ document.addEventListener('DOMContentLoaded', () => {
     finaleTimers = [];
   }
 
-  function triggerGameStartFinale(data) {
-    if (isGameUnlocked) return;
+  function triggerGameStartFinale(data, force = false) {
+    if (isGameUnlocked && !force) return;
     isGameUnlocked = true;
 
     console.log('🚀 100% REACHED! DIRECT FIREWORKS & WHITEOUT LAUNCHED!');
     clearFinaleTimers();
 
-    // 1. Single heavy booming sub-bass hit (NO brass fanfare)
-    window.hackathonAudio.playHeavyBassBoom();
+    // 1. Single heavy booming sub-bass hit & cinematic riser
+    try {
+      if (window.hackathonAudio) {
+        window.hackathonAudio.init();
+        if (window.hackathonAudio.playHeavyBassBoom) {
+          window.hackathonAudio.playHeavyBassBoom();
+        }
+      }
+    } catch (e) {
+      console.warn('Audio err:', e);
+    }
 
-    // 2. Sub-bass physical vibration impact
-    screenBody.classList.add('screen-shake');
-    const tShake = setTimeout(() => {
-      screenBody.classList.remove('screen-shake');
-    }, 900);
-    finaleTimers.push(tShake);
+    // 2. Sub-bass physical vibration impact on art stage (avoids transforming body which traps fixed elements)
+    const shakeTarget = document.getElementById('artStage') || document.getElementById('centerStage');
+    if (shakeTarget) {
+      shakeTarget.classList.add('screen-shake');
+      const tShake = setTimeout(() => {
+        shakeTarget.classList.remove('screen-shake');
+      }, 900);
+      finaleTimers.push(tShake);
+    }
 
     // 3. Hide presidential button and update label
     if (presidentTouchArea) {
-      presidentTouchArea.classList.add('opacity-0', 'pointer-events-none');
+      presidentTouchArea.classList.add('opacity-0', 'pointer-events-none', 'hidden');
+      presidentTouchArea.classList.remove('opacity-100', 'pointer-events-auto');
     }
-    energyStatusSubtext.textContent = '✦ CAPACITY 100% UNLOCKED ✦ CEREMONY ACTIVATED ✦';
-    energyStatusSubtext.className = 'text-xs font-mono-tech tracking-wider text-[#ffe600] uppercase px-4 py-1 rounded-full bg-[#ffe600]/25 border border-[#ffe600] animate-pulse font-bold shadow-[0_0_20px_#ffe600]';
+    if (energyStatusSubtext) {
+      energyStatusSubtext.textContent = '✦ ปลดล็อกพิธีเปิดสำเร็จ 100% ✦';
+      energyStatusSubtext.className = 'text-xs sm:text-sm font-kanit font-bold tracking-wider text-[#ffe600] uppercase px-5 py-1.5 rounded-full bg-[#ffe600]/25 border border-[#ffe600] animate-pulse font-bold shadow-[0_0_20px_#ffe600]';
+    }
 
     // 4. Explode Confetti / Fireworks immediately
-    createConfettiExplosion();
+    try {
+      createConfettiExplosion();
+    } catch (e) {
+      console.warn('Confetti err:', e);
+    }
 
-    // 5. Directly transition into pure full-screen whiteout (NO GAME START MODAL as requested!)
-    const tWhiteIn = setTimeout(() => {
-      whiteOutOverlay.classList.remove('opacity-0', 'pointer-events-none');
-      whiteOutOverlay.classList.add('opacity-100', 'whiteout-visible');
-      whiteOutOverlay.style.opacity = '1';
-      whiteOutOverlay.style.pointerEvents = 'auto';
+    // 5. Directly transition into pure full-screen whiteout (Guaranteed pure solid white #ffffff for 10 seconds!)
+    if (whiteOutOverlay) {
+      whiteOutOverlay.classList.add('whiteout-visible');
+      whiteOutOverlay.style.setProperty('opacity', '1', 'important');
+      whiteOutOverlay.style.setProperty('pointer-events', 'auto', 'important');
+      whiteOutOverlay.style.setProperty('display', 'flex', 'important');
+      whiteOutOverlay.style.setProperty('background-color', '#ffffff', 'important');
+      whiteOutOverlay.style.setProperty('z-index', '2147483647', 'important');
 
       // Hold pure white screen for 10 seconds ("ค้างไว้ 10 วิเลย แล้วก็มาหน้าปกติ")
       const tWhiteHold = setTimeout(() => {
-        whiteOutOverlay.classList.remove('opacity-100', 'whiteout-visible');
-        whiteOutOverlay.classList.add('opacity-0', 'pointer-events-none');
-        whiteOutOverlay.style.opacity = '0';
-        whiteOutOverlay.style.pointerEvents = 'none';
+        whiteOutOverlay.classList.remove('whiteout-visible');
+        whiteOutOverlay.style.setProperty('opacity', '0', 'important');
+        whiteOutOverlay.style.setProperty('pointer-events', 'none', 'important');
 
         // Stop confetti
         setTimeout(() => {
@@ -651,13 +677,11 @@ document.addEventListener('DOMContentLoaded', () => {
             ctx.clearRect(0, 0, confettiCanvas.width, confettiCanvas.height);
             confettiCanvas.classList.add('hidden');
           }
-        }, 1200);
+        }, 1000);
 
       }, 10000); // 10.0 seconds white screen hold!
       finaleTimers.push(tWhiteHold);
-
-    }, 600); // Brief moment celebrating then pure whiteout
-    finaleTimers.push(tWhiteIn);
+    }
   }
 
   // =========================================================================
@@ -679,7 +703,13 @@ document.addEventListener('DOMContentLoaded', () => {
     triggerGiant67();
   });
 
+  socket.on('game_force_start_trigger', () => {
+    isGameUnlocked = false;
+    clearFinaleTimers();
+  });
+
   socket.on('game_force_charging', (data) => {
+    isGameUnlocked = false; // Reset lock so 100% finale can fire!
     isForceSurging = true;
     const duration = data.durationMs || 2500;
 
@@ -729,7 +759,7 @@ document.addEventListener('DOMContentLoaded', () => {
     screenBody.classList.remove('charging-vibration');
     liquidWrapper.style.transition = '';
     updateDisplay(data);
-    triggerGameStartFinale(data);
+    triggerGameStartFinale(data, true);
   });
 
   socket.on('game_reset', (data) => {
@@ -743,7 +773,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Reset overlay & presidential button states
     if (presidentTouchArea) {
-      presidentTouchArea.classList.add('opacity-0', 'pointer-events-none', 'translate-y-2', 'scale-95');
+      presidentTouchArea.classList.add('opacity-0', 'pointer-events-none', 'translate-y-2', 'scale-95', 'hidden');
       presidentTouchArea.classList.remove('opacity-100', 'pointer-events-auto', 'translate-y-0', 'scale-100');
     }
     if (giant67Overlay) {
@@ -755,10 +785,11 @@ document.addEventListener('DOMContentLoaded', () => {
     gameStartOverlay.style.opacity = '1';
     gameStartOverlay.style.pointerEvents = 'none';
 
-    whiteOutOverlay.classList.remove('opacity-100', 'whiteout-visible');
-    whiteOutOverlay.classList.add('opacity-0', 'pointer-events-none');
-    whiteOutOverlay.style.opacity = '0';
-    whiteOutOverlay.style.pointerEvents = 'none';
+    if (whiteOutOverlay) {
+      whiteOutOverlay.classList.remove('whiteout-visible');
+      whiteOutOverlay.style.opacity = '0';
+      whiteOutOverlay.style.pointerEvents = 'none';
+    }
     doorSplitStage.classList.remove('door-open-active');
     doorSplitStage.classList.add('hidden');
     doorWhiteLight.classList.remove('door-white-flare');

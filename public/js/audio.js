@@ -162,37 +162,86 @@ class HackathonAudioEngine {
     const subOsc = this.ctx.createOscillator();
     const subGain = this.ctx.createGain();
     subOsc.type = 'sine';
-    subOsc.frequency.setValueAtTime(75, t);
-    subOsc.frequency.exponentialRampToValueAtTime(24, t + 1.8);
+    subOsc.frequency.setValueAtTime(80, t);
+    subOsc.frequency.exponentialRampToValueAtTime(22, t + 2.2);
 
     subGain.gain.setValueAtTime(1.0, t);
-    subGain.gain.setTargetAtTime(0.6, t + 0.15, 0.4);
-    subGain.gain.exponentialRampToValueAtTime(0.0001, t + 2.5);
+    subGain.gain.setTargetAtTime(0.7, t + 0.15, 0.4);
+    subGain.gain.exponentialRampToValueAtTime(0.0001, t + 3.0);
 
     subOsc.connect(subGain);
     subGain.connect(this.ctx.destination);
     subOsc.start(t);
-    subOsc.stop(t + 2.6);
+    subOsc.stop(t + 3.1);
 
     // 3. Deep resonant low rumble body
     const rumbleOsc = this.ctx.createOscillator();
     const rumbleGain = this.ctx.createGain();
     const rumbleFilter = this.ctx.createBiquadFilter();
     rumbleFilter.type = 'lowpass';
-    rumbleFilter.frequency.setValueAtTime(120, t);
+    rumbleFilter.frequency.setValueAtTime(140, t);
 
     rumbleOsc.type = 'triangle';
-    rumbleOsc.frequency.setValueAtTime(48, t);
-    rumbleOsc.frequency.linearRampToValueAtTime(28, t + 2.2);
+    rumbleOsc.frequency.setValueAtTime(52, t);
+    rumbleOsc.frequency.linearRampToValueAtTime(26, t + 2.5);
 
-    rumbleGain.gain.setValueAtTime(0.5, t);
-    rumbleGain.gain.exponentialRampToValueAtTime(0.001, t + 2.2);
+    rumbleGain.gain.setValueAtTime(0.65, t);
+    rumbleGain.gain.exponentialRampToValueAtTime(0.001, t + 2.6);
 
     rumbleOsc.connect(rumbleFilter);
     rumbleFilter.connect(rumbleGain);
     rumbleGain.connect(this.ctx.destination);
     rumbleOsc.start(t);
-    rumbleOsc.stop(t + 2.3);
+    rumbleOsc.stop(t + 2.7);
+
+    // 4. White Noise Explosion Impact Burst
+    try {
+      const bufferSize = this.ctx.sampleRate * 1.5;
+      const noiseBuffer = this.ctx.createBuffer(1, bufferSize, this.ctx.sampleRate);
+      const output = noiseBuffer.getChannelData(0);
+      for (let i = 0; i < bufferSize; i++) {
+        output[i] = Math.random() * 2 - 1;
+      }
+
+      const whiteNoise = this.ctx.createBufferSource();
+      whiteNoise.buffer = noiseBuffer;
+
+      const noiseFilter = this.ctx.createBiquadFilter();
+      noiseFilter.type = 'lowpass';
+      noiseFilter.frequency.setValueAtTime(800, t);
+      noiseFilter.frequency.exponentialRampToValueAtTime(60, t + 1.2);
+
+      const noiseGain = this.ctx.createGain();
+      noiseGain.gain.setValueAtTime(0.7, t);
+      noiseGain.gain.exponentialRampToValueAtTime(0.001, t + 1.2);
+
+      whiteNoise.connect(noiseFilter);
+      noiseFilter.connect(noiseGain);
+      noiseGain.connect(this.ctx.destination);
+      whiteNoise.start(t);
+      whiteNoise.stop(t + 1.3);
+    } catch (e) {
+      console.warn('Noise burst fallback', e);
+    }
+
+    // 5. Heroic Cyber Shimmer Riser Chord
+    const chordNotes = [261.63, 329.63, 392.00, 523.25, 659.25, 1046.50]; // C Major Sci-Fi Shimmer
+    chordNotes.forEach((freq, idx) => {
+      const chordOsc = this.ctx.createOscillator();
+      const chordGain = this.ctx.createGain();
+      chordOsc.type = idx % 2 === 0 ? 'sine' : 'triangle';
+      chordOsc.frequency.setValueAtTime(freq, t);
+      chordOsc.frequency.exponentialRampToValueAtTime(freq * 1.05, t + 2.0);
+
+      chordGain.gain.setValueAtTime(0.18 / chordNotes.length, t);
+      chordGain.gain.linearRampToValueAtTime(0.3 / chordNotes.length, t + 0.3);
+      chordGain.gain.exponentialRampToValueAtTime(0.0001, t + 2.5);
+
+      chordOsc.connect(chordGain);
+      chordGain.connect(this.ctx.destination);
+      chordOsc.start(t);
+      chordOsc.stop(t + 2.6);
+    });
   }
 
   // Alias for backward compatibility

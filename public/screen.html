@@ -15,9 +15,34 @@
   <script src="https://cdn.tailwindcss.com"></script>
   
   <!-- Custom Neon Cyberpunk & Retro Styles -->
-  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/style.css?v=whiteout_100_v2">
 
   <style>
+    /* Fullscreen Pure Whiteout on 100% Finish (Guaranteed solid white #ffffff viewport coverage) */
+    #whiteOutOverlay {
+      position: fixed !important;
+      inset: 0 !important;
+      top: 0 !important;
+      left: 0 !important;
+      right: 0 !important;
+      bottom: 0 !important;
+      width: 100vw !important;
+      height: 100vh !important;
+      background: #ffffff !important;
+      background-color: #ffffff !important;
+      z-index: 2147483647 !important;
+      display: flex !important;
+      align-items: center !important;
+      justify-content: center !important;
+      transition: opacity 0.7s cubic-bezier(0.2, 0.8, 0.2, 1) !important;
+      opacity: 0;
+      pointer-events: none;
+    }
+    #whiteOutOverlay.whiteout-visible {
+      opacity: 1 !important;
+      pointer-events: auto !important;
+    }
+
     body {
       background-color: #010626;
       overflow: hidden;
@@ -43,7 +68,7 @@
     }
   </style>
 </head>
-<body id="screenBody" class="cyber-bg text-white flex flex-col justify-start p-3 sm:p-4 lg:p-5 relative select-none overflow-hidden h-screen w-screen">
+<body id="screenBody" class="cyber-bg text-white flex flex-col justify-between p-4 lg:p-6 relative select-none">
 
   <!-- Interactive Ambient Canvas & Floor Grid -->
   <canvas id="ambientCanvas" class="absolute inset-0 pointer-events-none z-0"></canvas>
@@ -104,7 +129,7 @@
   </div>
 
   <!-- TOP CONDUIT STAGE: RETRO SEGMENTED BAR & TRANSFER RATE (ELEVATED ABOVE ARTWORK SO PEOPLE CANNOT BLOCK IT) -->
-  <section id="energyConduitStage" class="w-full max-w-4xl mx-auto z-15 relative mt-1 mb-2 px-3">
+  <section id="energyConduitStage" class="w-full max-w-5xl mx-auto z-15 relative mt-1 px-3">
     <div class="cyber-panel px-5 py-2.5 bg-[#020a26]/90 border border-[#00f0ff]/35 shadow-[0_0_20px_rgba(0,240,255,0.2)]">
       
       <!-- Stats Header Above Bar -->
@@ -148,14 +173,14 @@
   </section>
 
   <!-- CENTER STAGE: LIQUID WAVE FILL ARTWORK (REVEALS ARTWORK & FONTS GRADUALLY) -->
-  <main id="centerStage" class="flex-initial flex flex-col items-center justify-start relative z-10 mt-1">
+  <main id="centerStage" class="flex-1 flex flex-col items-center justify-center relative z-10 my-1">
     
     <div class="relative flex flex-col items-center">
       
       <!-- Outer Radial Portal Aura -->
       <div id="portalGlow" class="absolute inset-0 rounded-3xl bg-radial from-[#00f0ff]/20 via-[#1c75ff]/15 to-transparent blur-2xl transition-all duration-300 pointer-events-none"></div>
 
-      <!-- Liquid Wave Artwork Stage (576 x 1024 proportion) -->
+      <!-- Liquid Wave Artwork Stage (Wide 16:9 Auditorum Projection Banner) -->
       <div id="artStage" class="liquid-art-stage relative">
         
         <!-- White Light Core Behind Parting Doors -->
@@ -198,38 +223,31 @@
                class="art-active-layer">
         </div>
 
-        <!-- Standby Lobby: Displays Incoming Connected Players Before Game Starts -->
+        <!-- Standby Lobby: Minimalist & Grand ("สแกน QR Code เพื่อส่งพลังงาน") -->
         <div id="standbyLobbyOverlay" class="absolute inset-0 z-15 flex flex-col items-center justify-between p-4 sm:p-6 bg-gradient-to-b from-[#010926]/95 via-[#010626]/90 to-[#00041a]/95 backdrop-blur-md rounded-2xl border-2 border-[#00f0ff]/40 shadow-[0_0_40px_rgba(0,240,255,0.25)] transition-all duration-700">
           
-          <!-- Lobby Header -->
-          <div class="text-center space-y-1">
-            <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#00f0ff]/10 border border-[#00f0ff]/30 text-xs font-mono-tech text-[#00f0ff]">
-              <span class="w-2 h-2 rounded-full bg-[#00ff66] animate-ping"></span>
-              <span>LIVE AGENTS CONNECTING TO MAINFRAME</span>
-            </div>
-            <h3 class="font-orbitron text-base sm:text-xl font-black text-[#ffe600] neon-glow-yellow">
-              ผู้ส่งพลังงานที่กำลังเข้าสู่ระบบ
-            </h3>
-            <p class="text-xs text-gray-300 font-prompt">
-              สแกน QR Code เพื่อเชื่อมต่อและบันทึกชื่อขึ้นจอใหญ่
-            </p>
+          <!-- Clean, Big, Gorgeous Thai Headline -->
+          <div class="text-center pt-2">
+            <h1 class="font-kanit text-2xl sm:text-4xl lg:text-5xl font-black text-[#ffe600] neon-glow-yellow tracking-wide drop-shadow-[0_0_30px_rgba(255,230,0,0.55)]">
+              สแกน QR Code เพื่อส่งพลังงาน
+            </h1>
           </div>
 
-          <!-- Dynamic Cloud / Grid of Connected Players -->
-          <div id="standbyPlayersContainer" class="w-full flex-1 my-3 overflow-hidden flex flex-wrap content-center justify-center gap-2 p-2">
-            <div class="text-xs font-mono-tech text-gray-500 py-6 animate-pulse">
+          <!-- Dynamic Cloud of Connected Players -->
+          <div id="standbyPlayersContainer" class="w-full flex-1 my-2 overflow-hidden flex flex-wrap content-center justify-center gap-2.5 p-2">
+            <div class="text-sm font-kanit text-gray-400 py-6 animate-pulse">
               รอผู้เล่นสแกน QR Code เพื่อเชื่อมต่อ...
             </div>
           </div>
 
           <!-- Lobby Footer Count -->
-          <div class="flex items-center justify-between w-full pt-2 border-t border-[#00f0ff]/20 text-xs font-mono-tech text-gray-400">
-            <span class="flex items-center gap-1.5 text-[#00ff66]">
-              <span class="w-2 h-2 rounded-full bg-[#00ff66]"></span>
-              STATUS: WAITING FOR START SIGNAL
+          <div class="flex items-center justify-between w-full px-2 pt-2 border-t border-[#00f0ff]/20 text-xs sm:text-sm font-kanit text-gray-300">
+            <span class="flex items-center gap-2 text-[#00ff66]">
+              <span class="w-2.5 h-2.5 rounded-full bg-[#00ff66] animate-ping"></span>
+              <span>ระบบพร้อมรับพลังงาน</span>
             </span>
             <span>
-              เชื่อมต่อแล้ว: <strong id="lobbyConnectedCount" class="text-base text-[#00f0ff] font-orbitron font-bold">0</strong> คน
+              เชื่อมต่อแล้ว: <strong id="lobbyConnectedCount" class="text-lg sm:text-xl text-[#00f0ff] font-orbitron font-bold">0</strong> คน
             </span>
           </div>
         </div>
@@ -246,17 +264,26 @@
 
       <!-- Real-time Energy Status Label -->
       <div class="mt-2 text-center">
-        <span id="energyStatusSubtext" class="text-xs font-mono-tech tracking-wider text-[#00f0ff] uppercase px-4 py-1 rounded-full bg-[#00f0ff]/10 border border-[#00f0ff]/30">
-          ⚡ TRANSMITTING HACKER ENERGY... TAP TO CHARGE ⚡
+        <span id="energyStatusSubtext" class="text-xs sm:text-sm font-kanit font-semibold tracking-wider text-[#00f0ff] uppercase px-5 py-1 rounded-full bg-[#00f0ff]/10 border border-[#00f0ff]/30 shadow-[0_0_15px_rgba(0,240,255,0.25)]">
+          ⚡ สแกน QR Code เพื่อส่งพลังงาน ⚡
         </span>
       </div>
 
-      <!-- PRESIDENTIAL DUAL TOUCH BUTTON (Appears at 67.5% Plateau - Absolute Position, Zero Layout Shift) -->
-      <div id="presidentTouchArea" class="absolute left-1/2 -translate-x-1/2 top-[calc(100%+14px)] text-center transition-all duration-500 opacity-0 pointer-events-none transform translate-y-2 scale-95 z-30 whitespace-nowrap">
-        <button id="btnPresidentTouch" class="president-cyber-btn px-10 py-3 rounded-2xl shadow-[0_0_40px_rgba(255,230,0,0.7)]">
-          <span class="font-orbitron font-black text-xl sm:text-2xl md:text-3xl text-[#ffe600] tracking-widest neon-glow-yellow uppercase select-none">
-            TOUCH TO START
-          </span>
+      <!-- PRESIDENTIAL DUAL TOUCH BUTTON (Appears at 67.5% Plateau - Original Location & Style) -->
+      <div id="presidentTouchArea" class="mt-2.5 text-center transition-all duration-500 opacity-0 pointer-events-none transform translate-y-2 scale-95 hidden">
+        <button id="btnPresidentTouch" class="president-cyber-btn group cursor-pointer">
+          <div class="flex items-center justify-center gap-3.5 px-6 py-2.5">
+            <span class="text-2xl animate-bounce">✋</span>
+            <div class="text-left font-kanit">
+              <div class="font-black text-xs sm:text-sm text-[#ffe600] tracking-wider neon-glow-yellow flex items-center gap-2">
+                <span>⚡ PRESIDENTIAL OVERDRIVE : ประธานแตะหน้าจอพร้อมกัน ⚡</span>
+              </div>
+              <div class="text-[11px] text-[#00f0ff] tracking-wide">
+                [ ประธาน 2 ท่านสัมผัสหน้าจอพร้อมกัน เพื่อส่งพลังงานก้อนสุดท้าย 100% ]
+              </div>
+            </div>
+            <span class="text-2xl animate-bounce">✋</span>
+          </div>
         </button>
       </div>
 
@@ -270,26 +297,27 @@
         <span class="text-base">🏆</span>
         <span class="font-orbitron text-xs font-bold text-[#ffe600] tracking-wider">TOP 20 HACKERS</span>
       </div>
-      <button id="btnCloseLeaderboard" class="text-xs text-gray-400 hover:text-white px-1 font-mono-tech">[✕]</button>
+      <button id="btnCloseLeaderboard" class="text-xs text-gray-400 hover:text-white px-1 font-mono-tech cursor-pointer">[✕]</button>
     </div>
     <div id="leaderboardList" class="max-h-[58vh] overflow-y-auto space-y-1.5 pr-1 custom-scrollbar">
-      <div class="text-center text-xs text-gray-400 font-mono-tech py-6">
+      <div class="text-center text-xs text-gray-400 font-kanit py-6">
         กำลังรอผู้เข้าร่วมส่งพลังงาน...
+      </div>
     </div>
   </div>
 
-  <!-- FLOATING QR CODE CARD (TOGGLEABLE - CRISP HIGH-CONTRAST B&W) -->
-  <div id="qrModal" class="fixed top-16 right-4 z-50 bg-white text-gray-900 p-5 rounded-2xl shadow-[0_0_40px_rgba(255,255,255,0.8)] border-4 border-gray-100 flex flex-col items-center gap-2.5 transition-all duration-300 hidden">
-    <div class="text-xs font-orbitron font-black text-black tracking-wider uppercase">
-      SCAN TO JOIN HACKATHON
+  <!-- FLOATING QR CODE CARD (DIRECT CHILD OF BODY - HIGH Z-INDEX 50) -->
+  <div id="qrModal" class="fixed top-20 right-6 z-50 bg-white text-gray-900 p-5 rounded-2xl shadow-[0_0_50px_rgba(255,255,255,0.9)] border-4 border-gray-100 flex flex-col items-center gap-2.5 transition-all duration-300 hidden">
+    <div class="text-sm font-kanit font-black text-black tracking-wider uppercase">
+      สแกนเพื่อเข้าร่วม HACKATHON 2026
     </div>
-    <div class="p-1 bg-white rounded-xl border border-gray-200">
-      <img id="qrImg" src="" alt="QR Code" class="w-44 h-44 object-contain">
+    <div class="p-1.5 bg-white rounded-xl border border-gray-200 shadow-inner">
+      <img id="qrImg" src="" alt="QR Code" class="w-52 h-52 object-contain">
     </div>
-    <div class="text-center font-mono-tech text-[11px] text-gray-800 font-bold max-w-[200px]">
+    <div class="text-center font-mono-tech text-xs text-gray-800 font-bold max-w-[220px]">
       <span id="qrUrlText" class="text-blue-700 break-all font-mono"></span>
     </div>
-    <button onclick="document.getElementById('qrModal').classList.add('hidden')" class="text-[11px] text-gray-500 hover:text-black font-semibold underline mt-1">
+    <button onclick="document.getElementById('qrModal').classList.add('hidden')" class="text-xs text-gray-500 hover:text-black font-kanit font-semibold underline mt-1 cursor-pointer">
       [ ปิด QR Code ]
     </button>
   </div>
@@ -324,16 +352,16 @@
     </div>
   </div>
 
-  <!-- FULLSCREEN PURE WHITEOUT OVERLAY (10 Seconds Cinematic Hold) -->
-  <div id="whiteOutOverlay" class="fixed inset-0 bg-white z-[99999] pointer-events-none opacity-0 transition-opacity duration-1000 flex items-center justify-center">
-    <div class="font-orbitron font-bold text-gray-300/40 text-xs tracking-widest uppercase select-none">
+  <!-- FULLSCREEN PURE WHITEOUT OVERLAY (DIRECT CHILD OF BODY - 100% SOLID PURE WHITE #ffffff) -->
+  <div id="whiteOutOverlay">
+    <div class="font-orbitron font-bold text-gray-400/40 text-xs tracking-widest uppercase select-none">
       ✦ SYSTEM INITIALIZED ✦
     </div>
   </div>
 
   <!-- Socket.IO & Logic Scripts -->
   <script src="/socket.io/socket.io.js"></script>
-  <script src="js/audio.js"></script>
-  <script src="js/screen.js"></script>
+  <script src="js/audio.js?v=whiteout_100_v2"></script>
+  <script src="js/screen.js?v=whiteout_100_v2"></script>
 </body>
 </html>

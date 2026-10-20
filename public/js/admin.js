@@ -344,8 +344,9 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 
   btnTestFanfare.addEventListener('click', () => {
-    window.hackathonAudio.playGameStart();
-    addLog('Audio Test: Game Start Fanfare triggered', 'text-[#ffe600]');
+    window.hackathonAudio.init();
+    window.hackathonAudio.playHeavyBassBoom();
+    addLog('Audio Test: Climax Boom & Shimmer triggered', 'text-[#ffe600]');
   });
 
   // Socket Listeners

@@ -72,6 +72,17 @@ app.get('/api/qr', async (req, res) => {
   }
 });
 
+// REST Endpoints for Admin Direct Remote Overrides
+app.get('/api/admin/force100', (req, res) => {
+  performForce100();
+  res.json({ ok: true, message: 'FORCE 100% triggered' });
+});
+
+app.get('/api/admin/reset', (req, res) => {
+  performReset();
+  res.json({ ok: true, message: 'Game reset to 0' });
+});
+
 // Game State with Dynamic Pacing, 67% Plateau, Leaderboard & Presidential Touch
 const DEFAULT_TARGET = 2026;
 let gameState = {
@@ -144,6 +155,87 @@ function getConnectedPlayers() {
 let connectedUsers = 0;
 let forceChargingTimeout = null;
 let activeGlideInterval = null;
+
+// Presidential Touch / Dual Screen Touch Event (Module-level)
+function triggerPresidentialSurge(force = false) {
+  if (!force && (gameState.isGameStarted || gameState.presidentTriggered)) return;
+  gameState.presidentTriggered = true;
+  gameState.isFrozen = false;
+  gameState.eventStatus = 'RUNNING';
+
+  const CHARGE_DURATION_MS = 2500;
+  console.log(`⚡ [PRESIDENT TOUCH] Dual touch activated! Surging from 67% to 100% (${CHARGE_DURATION_MS}ms)...`);
+
+  io.emit('game_force_charging', {
+    durationMs: CHARGE_DURATION_MS,
+    startClicks: gameState.currentClicks,
+    targetClicks: gameState.targetClicks
+  });
+
+  if (forceChargingTimeout) clearTimeout(forceChargingTimeout);
+  forceChargingTimeout = setTimeout(() => {
+    forceChargingTimeout = null;
+    gameState.currentClicks = gameState.targetClicks;
+    gameState.isGameStarted = true;
+    gameState.eventStatus = 'FINISHED';
+    gameState.finishTime = Date.now();
+    recordClicks(500);
+
+    const durationSeconds = gameState.startTime 
+      ? ((gameState.finishTime - gameState.startTime) / 1000).toFixed(1) 
+      : '0';
+
+    console.log(`🎉 [100% UNLOCKED] President touch complete! Finished in ${durationSeconds}s!`);
+    io.emit('game_start', {
+      currentClicks: gameState.currentClicks,
+      rawClicksTotal: gameState.rawClicksTotal,
+      targetClicks: gameState.targetClicks,
+      durationSeconds,
+      timestamp: Date.now()
+    });
+  }, CHARGE_DURATION_MS);
+}
+
+function performForce100() {
+  console.log('🚀 [FORCE 100%] Executing instant 100% finale and whiteout...');
+  gameState.isGameStarted = false;
+  gameState.presidentTriggered = false;
+  io.emit('game_force_start_trigger');
+  triggerPresidentialSurge(true);
+}
+
+function performReset() {
+  console.log('🔄 [RESET] Resetting game state to 0...');
+  if (forceChargingTimeout) {
+    clearTimeout(forceChargingTimeout);
+    forceChargingTimeout = null;
+  }
+  if (activeGlideInterval) {
+    clearInterval(activeGlideInterval);
+    activeGlideInterval = null;
+  }
+  gameState.currentClicks = 0;
+  gameState.rawClicksTotal = 0;
+  gameState.isGameStarted = false;
+  gameState.eventStatus = 'STANDBY';
+  gameState.isFrozen = false;
+  gameState.stage67Triggered = false;
+  gameState.presidentTriggered = false;
+  gameState.startTime = null;
+  gameState.finishTime = null;
+  clickTimestamps.length = 0;
+  players.clear();
+  recentTappers.length = 0;
+
+  io.emit('game_reset', {
+    currentClicks: 0,
+    targetClicks: gameState.targetClicks,
+    percentage: 0,
+    eventStatus: 'STANDBY',
+    connectedPlayers: [],
+    topPlayers: []
+  });
+}
 
 io.on('connection', (socket) => {
   connectedUsers++;
@@ -291,54 +383,14 @@ io.on('connection', (socket) => {
     }
   });
 
-  // Presidential Touch / Dual Screen Touch Event
-  function triggerPresidentialSurge(force = false) {
-    if (!force && (gameState.isGameStarted || gameState.presidentTriggered)) return;
-    gameState.presidentTriggered = true;
-    gameState.isFrozen = false;
-    gameState.eventStatus = 'RUNNING';
-
-    const CHARGE_DURATION_MS = 2500;
-    console.log(`⚡ [PRESIDENT TOUCH] Dual touch activated! Surging from 67% to 100% (${CHARGE_DURATION_MS}ms)...`);
-
-    io.emit('game_force_charging', {
-      durationMs: CHARGE_DURATION_MS,
-      startClicks: gameState.currentClicks,
-      targetClicks: gameState.targetClicks
-    });
-
-    if (forceChargingTimeout) clearTimeout(forceChargingTimeout);
-    forceChargingTimeout = setTimeout(() => {
-      forceChargingTimeout = null;
-      gameState.currentClicks = gameState.targetClicks;
-      gameState.isGameStarted = true;
-      gameState.eventStatus = 'FINISHED';
-      gameState.finishTime = Date.now();
-      recordClicks(500);
-
-      const durationSeconds = gameState.startTime 
-        ? ((gameState.finishTime - gameState.startTime) / 1000).toFixed(1) 
-        : '0';
-
-      console.log(`🎉 [100% UNLOCKED] President touch complete! Finished in ${durationSeconds}s!`);
-      io.emit('game_start', {
-        currentClicks: gameState.currentClicks,
-        rawClicksTotal: gameState.rawClicksTotal,
-        targetClicks: gameState.targetClicks,
-        durationSeconds,
-        timestamp: Date.now()
-      });
-    }, CHARGE_DURATION_MS);
-  }
-
   // Trigger from Main Screen touchscreen
   socket.on('president_touch', () => {
-    triggerPresidentialSurge();
+    triggerPresidentialSurge(true);
   });
 
   // Trigger from Admin remote override
   socket.on('admin_president_touch', () => {
-    triggerPresidentialSurge();
+    triggerPresidentialSurge(true);
   });
 
   // Admin Controls: Direct Emergency Click Adjust (+/- 100, 500, 1000)
@@ -347,15 +399,15 @@ io.on('connection', (socket) => {
     if (!isNaN(amount)) {
       gameState.currentClicks = Math.max(0, Math.min(gameState.targetClicks, gameState.currentClicks + amount));
       console.log(`⚡ [ADMIN] Direct click adjust: ${amount > 0 ? '+' : ''}${amount} -> Current: ${gameState.currentClicks}`);
+      if (gameState.currentClicks >= gameState.targetClicks && !gameState.isGameStarted) {
+        triggerPresidentialSurge(true);
+      }
     }
   });
 
   // Admin Controls: Force 100% Start (Instant Climax)
   socket.on('admin_force_start', () => {
-    console.log('🚀 [ADMIN] admin_force_start received! Triggering 100% surge...');
-    gameState.isGameStarted = false;
-    gameState.presidentTriggered = false;
-    triggerPresidentialSurge(true);
+    performForce100();
   });
 
   // Admin Controls: Start / Pause Event
@@ -443,35 +495,7 @@ io.on('connection', (socket) => {
 
   // Admin Controls: Reset
   socket.on('admin_reset', () => {
-    if (forceChargingTimeout) {
-      clearTimeout(forceChargingTimeout);
-      forceChargingTimeout = null;
-    }
-    if (activeGlideInterval) {
-      clearInterval(activeGlideInterval);
-      activeGlideInterval = null;
-    }
-    gameState.currentClicks = 0;
-    gameState.rawClicksTotal = 0;
-    gameState.isGameStarted = false;
-    gameState.eventStatus = 'STANDBY';
-    gameState.isFrozen = false;
-    gameState.stage67Triggered = false;
-    gameState.presidentTriggered = false;
-    gameState.startTime = null;
-    gameState.finishTime = null;
-    clickTimestamps.length = 0;
-    players.clear();
-    recentTappers.length = 0;
-
-    console.log('🔄 [ADMIN] Game reset to STANDBY 0%!');
-    io.emit('game_reset', {
-      currentClicks: 0,
-      targetClicks: gameState.targetClicks,
-      percentage: 0,
-      eventStatus: 'STANDBY',
-      isGameStarted: false
-    });
+    performReset();
   });
 
   socket.on('disconnect', () => {
