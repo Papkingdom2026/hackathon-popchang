@@ -271,34 +271,34 @@ body.scrollable-body {
  * ========================================================================= */
 :root {
   --stage-width: 1240px;
-  --stage-height: 570px;
+  --stage-height: 530px;
 }
 
 @media (min-width: 1800px) {
   :root {
     --stage-width: 1360px;
-    --stage-height: 620px;
+    --stage-height: 580px;
   }
 }
 
 @media (max-height: 900px) {
   :root {
-    --stage-width: 1100px;
-    --stage-height: 500px;
+    --stage-width: 1080px;
+    --stage-height: 450px;
   }
 }
 
 @media (max-height: 768px) {
   :root {
-    --stage-width: 980px;
-    --stage-height: 440px;
+    --stage-width: 950px;
+    --stage-height: 390px;
   }
 }
 
 @media (max-width: 1200px) {
   :root {
     --stage-width: 94vw;
-    --stage-height: 45vw;
+    --stage-height: 44vw;
   }
 }
 
@@ -307,7 +307,7 @@ body.scrollable-body {
   width: var(--stage-width);
   max-width: 96vw;
   height: var(--stage-height);
-  max-height: 64vh;
+  max-height: 55vh;
   margin: 0 auto;
   border-radius: 24px;
   overflow: hidden;

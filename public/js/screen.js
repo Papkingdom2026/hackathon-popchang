@@ -392,6 +392,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
       if (presidentTouchArea) {
         presidentTouchArea.classList.remove('hidden');
+        const energyStatusArea = document.getElementById('energyStatusArea');
+        if (energyStatusArea) energyStatusArea.classList.add('hidden');
         requestAnimationFrame(() => {
           presidentTouchArea.classList.remove('opacity-0', 'pointer-events-none', 'translate-y-2', 'scale-95');
           presidentTouchArea.classList.add('opacity-100', 'pointer-events-auto', 'translate-y-0', 'scale-100');
@@ -640,6 +642,8 @@ document.addEventListener('DOMContentLoaded', () => {
     if (presidentTouchArea) {
       presidentTouchArea.classList.add('opacity-0', 'pointer-events-none', 'hidden');
       presidentTouchArea.classList.remove('opacity-100', 'pointer-events-auto');
+      const energyStatusArea = document.getElementById('energyStatusArea');
+      if (energyStatusArea) energyStatusArea.classList.remove('hidden');
     }
     if (energyStatusSubtext) {
       energyStatusSubtext.textContent = '✦ CEREMONY UNLOCKED 100% ✦';
@@ -775,6 +779,8 @@ document.addEventListener('DOMContentLoaded', () => {
     if (presidentTouchArea) {
       presidentTouchArea.classList.add('opacity-0', 'pointer-events-none', 'translate-y-2', 'scale-95', 'hidden');
       presidentTouchArea.classList.remove('opacity-100', 'pointer-events-auto', 'translate-y-0', 'scale-100');
+      const energyStatusArea = document.getElementById('energyStatusArea');
+      if (energyStatusArea) energyStatusArea.classList.remove('hidden');
     }
     if (giant67Overlay) {
       giant67Overlay.classList.remove('opacity-100');
