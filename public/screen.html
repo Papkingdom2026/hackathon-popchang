@@ -221,33 +221,31 @@
                src="/assets/hackathon_logo_wide.png" 
                alt="Hackathon Banner Active" 
                class="art-active-layer">
-        </div>
-
-        <!-- Standby Lobby: Minimalist & Grand ("สแกน QR Code เพื่อส่งพลังงาน") -->
+               <!-- Standby Lobby: Minimalist & Grand ("SCAN QR CODE TO TRANSMIT ENERGY") -->
         <div id="standbyLobbyOverlay" class="absolute inset-0 z-15 flex flex-col items-center justify-between p-4 sm:p-6 bg-gradient-to-b from-[#010926]/95 via-[#010626]/90 to-[#00041a]/95 backdrop-blur-md rounded-2xl border-2 border-[#00f0ff]/40 shadow-[0_0_40px_rgba(0,240,255,0.25)] transition-all duration-700">
           
-          <!-- Clean, Big, Gorgeous Thai Headline -->
+          <!-- Clean, Big, Gorgeous English Headline -->
           <div class="text-center pt-2">
-            <h1 class="font-kanit text-2xl sm:text-4xl lg:text-5xl font-black text-[#ffe600] neon-glow-yellow tracking-wide drop-shadow-[0_0_30px_rgba(255,230,0,0.55)]">
-              สแกน QR Code เพื่อส่งพลังงาน
+            <h1 class="font-orbitron text-2xl sm:text-3xl lg:text-4xl font-black text-[#ffe600] neon-glow-yellow tracking-wider drop-shadow-[0_0_30px_rgba(255,230,0,0.55)]">
+              SCAN QR CODE TO TRANSMIT ENERGY
             </h1>
           </div>
 
           <!-- Dynamic Cloud of Connected Players -->
           <div id="standbyPlayersContainer" class="w-full flex-1 my-2 overflow-hidden flex flex-wrap content-center justify-center gap-2.5 p-2">
-            <div class="text-sm font-kanit text-gray-400 py-6 animate-pulse">
-              รอผู้เล่นสแกน QR Code เพื่อเชื่อมต่อ...
+            <div class="text-sm font-mono-tech text-gray-400 py-6 animate-pulse">
+              Waiting for agents to scan QR code & connect...
             </div>
           </div>
 
           <!-- Lobby Footer Count -->
-          <div class="flex items-center justify-between w-full px-2 pt-2 border-t border-[#00f0ff]/20 text-xs sm:text-sm font-kanit text-gray-300">
+          <div class="flex items-center justify-between w-full px-2 pt-2 border-t border-[#00f0ff]/20 text-xs sm:text-sm font-mono-tech text-gray-300">
             <span class="flex items-center gap-2 text-[#00ff66]">
               <span class="w-2.5 h-2.5 rounded-full bg-[#00ff66] animate-ping"></span>
-              <span>ระบบพร้อมรับพลังงาน</span>
+              <span>SYSTEM READY FOR ENERGY HARVEST</span>
             </span>
             <span>
-              เชื่อมต่อแล้ว: <strong id="lobbyConnectedCount" class="text-lg sm:text-xl text-[#00f0ff] font-orbitron font-bold">0</strong> คน
+              CONNECTED AGENTS: <strong id="lobbyConnectedCount" class="text-lg sm:text-xl text-[#00f0ff] font-orbitron font-bold">0</strong>
             </span>
           </div>
         </div>
@@ -264,8 +262,8 @@
 
       <!-- Real-time Energy Status Label -->
       <div class="mt-2 text-center">
-        <span id="energyStatusSubtext" class="text-xs sm:text-sm font-kanit font-semibold tracking-wider text-[#00f0ff] uppercase px-5 py-1 rounded-full bg-[#00f0ff]/10 border border-[#00f0ff]/30 shadow-[0_0_15px_rgba(0,240,255,0.25)]">
-          ⚡ สแกน QR Code เพื่อส่งพลังงาน ⚡
+        <span id="energyStatusSubtext" class="text-xs sm:text-sm font-orbitron font-bold tracking-wider text-[#00f0ff] uppercase px-5 py-1.5 rounded-full bg-[#00f0ff]/10 border border-[#00f0ff]/30 shadow-[0_0_15px_rgba(0,240,255,0.25)]">
+          ⚡ SCAN QR CODE TO TRANSMIT ENERGY ⚡
         </span>
       </div>
 
@@ -274,12 +272,12 @@
         <button id="btnPresidentTouch" class="president-cyber-btn group cursor-pointer">
           <div class="flex items-center justify-center gap-3.5 px-6 py-2.5">
             <span class="text-2xl animate-bounce">✋</span>
-            <div class="text-left font-kanit">
+            <div class="text-left font-orbitron">
               <div class="font-black text-xs sm:text-sm text-[#ffe600] tracking-wider neon-glow-yellow flex items-center gap-2">
-                <span>⚡ PRESIDENTIAL OVERDRIVE : ประธานแตะหน้าจอพร้อมกัน ⚡</span>
+                <span>⚡ PRESIDENTIAL OVERDRIVE : TOUCH SCREEN TOGETHER ⚡</span>
               </div>
-              <div class="text-[11px] text-[#00f0ff] tracking-wide">
-                [ ประธาน 2 ท่านสัมผัสหน้าจอพร้อมกัน เพื่อส่งพลังงานก้อนสุดท้าย 100% ]
+              <div class="text-[10px] font-mono-tech text-[#00f0ff] tracking-wide">
+                [ DUAL TOUCH: TOUCH SCREEN SIMULTANEOUSLY FOR 100% FINALE ]
               </div>
             </div>
             <span class="text-2xl animate-bounce">✋</span>
@@ -300,16 +298,16 @@
       <button id="btnCloseLeaderboard" class="text-xs text-gray-400 hover:text-white px-1 font-mono-tech cursor-pointer">[✕]</button>
     </div>
     <div id="leaderboardList" class="max-h-[58vh] overflow-y-auto space-y-1.5 pr-1 custom-scrollbar">
-      <div class="text-center text-xs text-gray-400 font-kanit py-6">
-        กำลังรอผู้เข้าร่วมส่งพลังงาน...
+      <div class="text-center text-xs text-gray-400 font-mono-tech py-6">
+        Waiting for hackers to transmit energy...
       </div>
     </div>
   </div>
 
   <!-- FLOATING QR CODE CARD (DIRECT CHILD OF BODY - HIGH Z-INDEX 50) -->
   <div id="qrModal" class="fixed top-20 right-6 z-50 bg-white text-gray-900 p-5 rounded-2xl shadow-[0_0_50px_rgba(255,255,255,0.9)] border-4 border-gray-100 flex flex-col items-center gap-2.5 transition-all duration-300 hidden">
-    <div class="text-sm font-kanit font-black text-black tracking-wider uppercase">
-      สแกนเพื่อเข้าร่วม HACKATHON 2026
+    <div class="text-sm font-orbitron font-black text-black tracking-wider uppercase">
+      SCAN TO JOIN HACKATHON 2026
     </div>
     <div class="p-1.5 bg-white rounded-xl border border-gray-200 shadow-inner">
       <img id="qrImg" src="" alt="QR Code" class="w-52 h-52 object-contain">
@@ -317,8 +315,8 @@
     <div class="text-center font-mono-tech text-xs text-gray-800 font-bold max-w-[220px]">
       <span id="qrUrlText" class="text-blue-700 break-all font-mono"></span>
     </div>
-    <button onclick="document.getElementById('qrModal').classList.add('hidden')" class="text-xs text-gray-500 hover:text-black font-kanit font-semibold underline mt-1 cursor-pointer">
-      [ ปิด QR Code ]
+    <button onclick="document.getElementById('qrModal').classList.add('hidden')" class="text-xs text-gray-500 hover:text-black font-mono-tech font-bold uppercase underline mt-1 cursor-pointer">
+      [ Close QR Code ]
     </button>
   </div>
 

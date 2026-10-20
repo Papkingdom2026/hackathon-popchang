@@ -284,7 +284,7 @@ document.addEventListener('DOMContentLoaded', () => {
     if (!playersList || playersList.length === 0) {
       standbyPlayersContainer.innerHTML = `
         <div class="text-xs font-mono-tech text-gray-500 py-6 animate-pulse">
-          รอผู้เล่นสแกน QR Code เพื่อเชื่อมต่อ...
+          Waiting for agents to scan QR code & connect...
         </div>
       `;
       if (lobbyConnectedCount) lobbyConnectedCount.textContent = '0';
@@ -298,9 +298,9 @@ document.addEventListener('DOMContentLoaded', () => {
     let html = '';
     playersList.forEach((p) => {
       html += `
-        <div class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-[#00f0ff]/10 border border-[#00f0ff]/40 shadow-[0_0_12px_rgba(0,240,255,0.2)] text-xs text-white font-prompt transform hover:scale-105 transition-all">
+        <div class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-[#00f0ff]/10 border border-[#00f0ff]/40 shadow-[0_0_12px_rgba(0,240,255,0.2)] text-xs text-white font-mono-tech transform hover:scale-105 transition-all">
           <span class="w-2 h-2 rounded-full bg-[#00ff66] animate-pulse"></span>
-          <span class="font-medium text-gray-100">${escapeHtml(p.name)}</span>
+          <span class="font-bold text-gray-100">${escapeHtml(p.name)}</span>
         </div>
       `;
     });
@@ -312,7 +312,7 @@ document.addEventListener('DOMContentLoaded', () => {
     if (!playersList || playersList.length === 0) {
       leaderboardList.innerHTML = `
         <div class="text-center text-xs text-gray-400 font-mono-tech py-6">
-          กำลังรอผู้เข้าร่วมส่งพลังงาน...
+          Waiting for hackers to transmit energy...
         </div>
       `;
       return;
@@ -518,16 +518,16 @@ document.addEventListener('DOMContentLoaded', () => {
       });
     }
 
-    // Dynamic Subtext status - Clean & Minimal
+    // Dynamic Subtext status - Clean Cyber English
     if (percentage < 67) {
-      energyStatusSubtext.textContent = '⚡ สแกน QR Code เพื่อส่งพลังงาน ⚡';
-      energyStatusSubtext.className = 'text-xs sm:text-sm font-kanit font-semibold tracking-wider text-[#00f0ff] uppercase px-5 py-1.5 rounded-full bg-[#00f0ff]/10 border border-[#00f0ff]/30 shadow-[0_0_15px_rgba(0,240,255,0.25)]';
+      energyStatusSubtext.textContent = '⚡ SCAN QR CODE TO TRANSMIT ENERGY ⚡';
+      energyStatusSubtext.className = 'text-xs sm:text-sm font-orbitron font-bold tracking-wider text-[#00f0ff] uppercase px-5 py-1.5 rounded-full bg-[#00f0ff]/10 border border-[#00f0ff]/30 shadow-[0_0_15px_rgba(0,240,255,0.25)]';
     } else if (percentage < 70) {
-      energyStatusSubtext.textContent = '✋ STAGE 67% : ประธานแตะหน้าจอพร้อมกัน ✋';
-      energyStatusSubtext.className = 'text-xs sm:text-sm font-kanit font-bold tracking-wider text-[#ffe600] uppercase px-5 py-1.5 rounded-full bg-[#ffe600]/20 border border-[#ffe600]/50 animate-pulse font-bold';
+      energyStatusSubtext.textContent = '✋ STAGE 67% : TOUCH SCREEN SIMULTANEOUSLY ✋';
+      energyStatusSubtext.className = 'text-xs sm:text-sm font-orbitron font-bold tracking-wider text-[#ffe600] uppercase px-5 py-1.5 rounded-full bg-[#ffe600]/20 border border-[#ffe600]/50 animate-pulse font-bold';
     } else if (percentage < 100) {
-      energyStatusSubtext.textContent = '⚡ กำลังพุ่งสู่ 100% สูงสุด! ⚡';
-      energyStatusSubtext.className = 'text-xs sm:text-sm font-kanit font-bold tracking-wider text-[#ff007f] uppercase px-5 py-1.5 rounded-full bg-[#ff007f]/20 border border-[#ff007f]/50 animate-pulse font-bold';
+      energyStatusSubtext.textContent = '⚡ SURGING TOWARDS 100% MAXIMUM! ⚡';
+      energyStatusSubtext.className = 'text-xs sm:text-sm font-orbitron font-bold tracking-wider text-[#ff007f] uppercase px-5 py-1.5 rounded-full bg-[#ff007f]/20 border border-[#ff007f]/50 animate-pulse font-bold';
     }
 
     if ((data.isGameStarted || percentage >= 100) && !isGameUnlocked) {
@@ -642,8 +642,8 @@ document.addEventListener('DOMContentLoaded', () => {
       presidentTouchArea.classList.remove('opacity-100', 'pointer-events-auto');
     }
     if (energyStatusSubtext) {
-      energyStatusSubtext.textContent = '✦ ปลดล็อกพิธีเปิดสำเร็จ 100% ✦';
-      energyStatusSubtext.className = 'text-xs sm:text-sm font-kanit font-bold tracking-wider text-[#ffe600] uppercase px-5 py-1.5 rounded-full bg-[#ffe600]/25 border border-[#ffe600] animate-pulse font-bold shadow-[0_0_20px_#ffe600]';
+      energyStatusSubtext.textContent = '✦ CEREMONY UNLOCKED 100% ✦';
+      energyStatusSubtext.className = 'text-xs sm:text-sm font-orbitron font-bold tracking-wider text-[#ffe600] uppercase px-5 py-1.5 rounded-full bg-[#ffe600]/25 border border-[#ffe600] animate-pulse font-bold shadow-[0_0_20px_#ffe600]';
     }
 
     // 4. Explode Confetti / Fireworks immediately

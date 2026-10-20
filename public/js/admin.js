@@ -73,16 +73,16 @@ document.addEventListener('DOMContentLoaded', () => {
     sliderMultiplier.value = mult;
     sliderValueText.textContent = `${mult.toFixed(2)}x`;
     
-    let label = 'ปกติ';
-    if (mult <= 0.25) label = 'สโลว์มาก (ยืดเวลา)';
-    else if (mult <= 0.75) label = 'ปานกลาง';
-    else if (mult > 1.2) label = 'บูสต์เร็ว';
+    let label = 'Normal';
+    if (mult <= 0.25) label = 'Slow (100+ Users)';
+    else if (mult <= 0.75) label = 'Medium (~1 Min)';
+    else if (mult > 1.2) label = 'Fast Rush';
 
     badgeMultiplier.textContent = `${mult.toFixed(2)}x (${label})`;
 
     // Helper text calculation
     const tapsForTenPoints = Math.round(10 / mult);
-    multiplierHelpText.textContent = `💡 กดนิ้ว ${tapsForTenPoints} ครั้ง = ได้ 10 แต้มพลังงาน (ตัวคูณ ${mult.toFixed(2)}x)`;
+    multiplierHelpText.textContent = `💡 ${tapsForTenPoints} Physical Taps = 10 Energy Points (${mult.toFixed(2)}x)`;
 
     // Update active preset button highlight
     document.querySelectorAll('.btn-preset-mult').forEach(btn => {
@@ -260,10 +260,10 @@ document.addEventListener('DOMContentLoaded', () => {
   if (btnAdminPresidentTouch) {
     btnAdminPresidentTouch.addEventListener('click', () => {
       if (!presidentConfirmTimeout) {
-        btnAdminPresidentTouch.innerHTML = '<span>⚠️</span> กดอีกครั้งเพื่อยืนยัน (ประธานแตะ)';
+        btnAdminPresidentTouch.innerHTML = '<span>⚠️</span> Click Again to Confirm (Dual Touch)';
         btnAdminPresidentTouch.classList.add('animate-pulse');
         presidentConfirmTimeout = setTimeout(() => {
-          btnAdminPresidentTouch.innerHTML = '⚡ จำลองประธานแตะ ➔ 100%';
+          btnAdminPresidentTouch.innerHTML = '⚡ Simulate Dual Touch ➔ 100% Surge';
           btnAdminPresidentTouch.classList.remove('animate-pulse');
           presidentConfirmTimeout = null;
         }, 3500);
@@ -271,7 +271,7 @@ document.addEventListener('DOMContentLoaded', () => {
       }
       clearTimeout(presidentConfirmTimeout);
       presidentConfirmTimeout = null;
-      btnAdminPresidentTouch.innerHTML = '⚡ จำลองประธานแตะ ➔ 100%';
+      btnAdminPresidentTouch.innerHTML = '⚡ Simulate Dual Touch ➔ 100% Surge';
       btnAdminPresidentTouch.classList.remove('animate-pulse');
       socket.emit('admin_president_touch');
       addLog('⚡ Presidential Touch Triggered -> Boosting to 100%!', 'text-[#ffe600] font-bold');
@@ -282,10 +282,10 @@ document.addEventListener('DOMContentLoaded', () => {
   let forceConfirmTimeout = null;
   btnForceStart.addEventListener('click', () => {
     if (!forceConfirmTimeout) {
-      btnForceStart.innerHTML = '<span>⚠️</span> กดอีกครั้งเพื่อยืนยัน (FORCE 100%)';
+      btnForceStart.innerHTML = '<span>⚠️</span> Click Again to Confirm (FORCE 100%)';
       btnForceStart.classList.add('animate-pulse');
       forceConfirmTimeout = setTimeout(() => {
-        btnForceStart.innerHTML = '<span>🚀</span> FORCE 100% (จบพิธีทันที / จุดพลุ + จอขาว)';
+        btnForceStart.innerHTML = '<span>🚀</span> FORCE 100% FINALE (Boom + 10s Whiteout)';
         btnForceStart.classList.remove('animate-pulse');
         forceConfirmTimeout = null;
       }, 3500);
@@ -293,7 +293,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
     clearTimeout(forceConfirmTimeout);
     forceConfirmTimeout = null;
-    btnForceStart.innerHTML = '<span>🚀</span> FORCE 100% (จบพิธีทันที / จุดพลุ + จอขาว)';
+    btnForceStart.innerHTML = '<span>🚀</span> FORCE 100% FINALE (Boom + 10s Whiteout)';
     btnForceStart.classList.remove('animate-pulse');
     socket.emit('admin_force_start');
     addLog('🚀 Admin triggered FORCE 100%!', 'text-[#ffe600] font-bold');
@@ -303,10 +303,10 @@ document.addEventListener('DOMContentLoaded', () => {
   let resetConfirmTimeout = null;
   btnReset.addEventListener('click', () => {
     if (!resetConfirmTimeout) {
-      btnReset.innerHTML = '<span>⚠️</span> กดอีกครั้งเพื่อยืนยันรีเซ็ตเป็น 0';
+      btnReset.innerHTML = '<span>⚠️</span> Click Again to Confirm (Reset to 0)';
       btnReset.classList.add('animate-pulse');
       resetConfirmTimeout = setTimeout(() => {
-        btnReset.innerHTML = '<span>🔄</span> RESET GAME (เริ่มนับ 0 ใหม่)';
+        btnReset.innerHTML = '<span>🔄</span> RESET GAME (Start From 0)';
         btnReset.classList.remove('animate-pulse');
         resetConfirmTimeout = null;
       }, 3500);
@@ -314,7 +314,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
     clearTimeout(resetConfirmTimeout);
     resetConfirmTimeout = null;
-    btnReset.innerHTML = '<span>🔄</span> RESET GAME (เริ่มนับ 0 ใหม่)';
+    btnReset.innerHTML = '<span>🔄</span> RESET GAME (Start From 0)';
     btnReset.classList.remove('animate-pulse');
     socket.emit('admin_reset');
     addLog('🔄 Admin reset game state to 0', 'text-gray-400');
@@ -372,19 +372,19 @@ document.addEventListener('DOMContentLoaded', () => {
 
   socket.on('game_force_charging', (data) => {
     addLog(`⚡ [OVERDRIVE] Force 100% Charging Surge Initiated (${(data.durationMs/1000).toFixed(1)}s)...`, 'text-[#ffe600] font-bold');
-    btnForceStart.innerHTML = '<span>⚡</span> กำลังเร่งพลังงานสู่ 100% (SURGING...)...';
+    btnForceStart.innerHTML = '<span>⚡</span> Surging Energy towards 100%...';
     btnForceStart.classList.add('animate-pulse');
   });
 
   socket.on('game_start', (data) => {
-    btnForceStart.innerHTML = '<span>🚀</span> FORCE 100% (จบเกมทันที / GAME START)';
+    btnForceStart.innerHTML = '<span>🚀</span> FORCE 100% FINALE (Boom + 10s Whiteout)';
     btnForceStart.classList.remove('animate-pulse');
     updateDashboard(data);
     addLog('🎉 [EVENT] Target reached! GAME START UNLOCKED!', 'text-[#ffe600] font-bold');
   });
 
   socket.on('game_reset', (data) => {
-    btnForceStart.innerHTML = '<span>🚀</span> FORCE 100% (จบเกมทันที / GAME START)';
+    btnForceStart.innerHTML = '<span>🚀</span> FORCE 100% FINALE (Boom + 10s Whiteout)';
     btnForceStart.classList.remove('animate-pulse');
     updateDashboard(data);
     addLog('🔄 [EVENT] Game was reset by administrator.', 'text-gray-400');
@@ -439,17 +439,17 @@ document.addEventListener('DOMContentLoaded', () => {
     // Event Status Badge
     if (data.eventStatus && badgeEventStatus) {
       if (data.eventStatus === 'STANDBY') {
-        badgeEventStatus.textContent = 'STANDBY (รอปล่อยตัว)';
-        badgeEventStatus.className = 'px-2.5 py-0.5 rounded text-[11px] font-bold bg-[#ffe600]/20 text-[#ffe600] border border-[#ffe600]/50 animate-pulse';
+        badgeEventStatus.textContent = 'STANDBY';
+        badgeEventStatus.className = 'px-2.5 py-0.5 rounded text-[11px] font-bold bg-[#ffe600]/20 text-[#ffe600] border border-[#ffe600]/50 animate-pulse font-mono-tech';
       } else if (data.eventStatus === 'RUNNING') {
-        badgeEventStatus.textContent = 'RUNNING (กำลังแข่ง)';
-        badgeEventStatus.className = 'px-2.5 py-0.5 rounded text-[11px] font-bold bg-[#00ff66]/20 text-[#00ff66] border border-[#00ff66]/50';
+        badgeEventStatus.textContent = 'RUNNING';
+        badgeEventStatus.className = 'px-2.5 py-0.5 rounded text-[11px] font-bold bg-[#00ff66]/20 text-[#00ff66] border border-[#00ff66]/50 font-mono-tech';
       } else if (data.eventStatus === 'PLATEAU_67') {
-        badgeEventStatus.textContent = 'PLATEAU 67% (รอประธานแตะ)';
-        badgeEventStatus.className = 'px-2.5 py-0.5 rounded text-[11px] font-bold bg-purple-500/20 text-purple-300 border border-purple-500/50 animate-pulse';
+        badgeEventStatus.textContent = 'STAGE 67% (DUAL TOUCH)';
+        badgeEventStatus.className = 'px-2.5 py-0.5 rounded text-[11px] font-bold bg-purple-500/20 text-purple-300 border border-purple-500/50 animate-pulse font-mono-tech';
       } else if (data.eventStatus === 'FINISHED') {
-        badgeEventStatus.textContent = 'FINISHED (สำเร็จแล้ว)';
-        badgeEventStatus.className = 'px-2.5 py-0.5 rounded text-[11px] font-bold bg-[#00f0ff]/20 text-[#00f0ff] border border-[#00f0ff]/50';
+        badgeEventStatus.textContent = 'FINISHED';
+        badgeEventStatus.className = 'px-2.5 py-0.5 rounded text-[11px] font-bold bg-[#00f0ff]/20 text-[#00f0ff] border border-[#00f0ff]/50 font-mono-tech';
       }
     }
 
@@ -457,10 +457,10 @@ document.addEventListener('DOMContentLoaded', () => {
     if (data.isFrozen !== undefined && btnToggleFreeze) {
       isSystemFrozen = !!data.isFrozen;
       if (isSystemFrozen) {
-        btnToggleFreeze.textContent = '🔥 ปลดล็อค (UNFREEZE)';
+        btnToggleFreeze.textContent = '🔥 UNFREEZE';
         btnToggleFreeze.className = 'cyber-btn cyber-btn-pink text-[10px] py-1 px-2 animate-pulse';
       } else {
-        btnToggleFreeze.textContent = '❄️ ตรึง % คงที่ (FREEZE)';
+        btnToggleFreeze.textContent = '❄️ FREEZE';
         btnToggleFreeze.className = 'cyber-btn text-[10px] py-1 px-2 border-cyan-400';
       }
     }
@@ -474,7 +474,7 @@ document.addEventListener('DOMContentLoaded', () => {
   function renderAdminLeaderboard(topPlayers) {
     if (!adminLeaderboardList) return;
     if (!topPlayers || topPlayers.length === 0) {
-      adminLeaderboardList.innerHTML = '<div class="text-gray-500 text-center py-4 col-span-full">ยังไม่มีคะแนนผู้เล่น</div>';
+      adminLeaderboardList.innerHTML = '<div class="text-gray-500 text-center py-4 col-span-full">Waiting for player scores...</div>';
       return;
     }
     adminLeaderboardList.innerHTML = '';

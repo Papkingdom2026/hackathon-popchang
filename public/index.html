@@ -47,8 +47,8 @@
       <!-- Player Nickname with Edit -->
       <div class="flex items-center gap-1.5">
         <span class="text-gray-400">👤:</span>
-        <span id="playerNameDisplay" class="font-bold text-[#00f0ff] truncate max-w-[140px]">ผู้เข้าร่วม</span>
-        <button id="btnEditName" class="text-[10px] text-gray-400 hover:text-white px-1" title="เปลี่ยนชื่อ">✏️</button>
+        <span id="playerNameDisplay" class="font-bold text-[#00f0ff] truncate max-w-[140px]">Hacker Agent</span>
+        <button id="btnEditName" class="text-[10px] text-gray-400 hover:text-white px-1" title="Edit Nickname">✏️</button>
       </div>
 
       <!-- Online Beacon & Sound Toggle -->
@@ -65,7 +65,7 @@
     <!-- Personal Clicks Bar Row -->
     <div class="flex items-center justify-between font-mono-tech text-xs mb-2">
       <div class="flex items-center gap-1.5 px-3 py-1 rounded-full bg-black/50 border border-[#00f0ff]/30 shadow-[0_0_15px_rgba(0,240,255,0.25)] w-full justify-between">
-        <span class="text-[#ffe600] font-bold text-xs">⚡ พลังที่คุณส่ง:</span>
+        <span class="text-[#ffe600] font-bold text-xs uppercase">⚡ YOUR ENERGY TAPS:</span>
         <span class="font-orbitron font-black text-lg text-[#ffe600] neon-glow-yellow">
           <span id="myClicks">0</span>
         </span>
@@ -127,22 +127,22 @@
 
         <div>
           <h2 class="font-orbitron text-xl sm:text-2xl font-black text-[#ffe600] neon-glow-yellow uppercase tracking-wide leading-tight">
-            หยุดกดชั่วคราว!
+            HOLD YOUR TAPS!
           </h2>
         </div>
 
         <!-- Main Instruction Card (Huge & High Contrast) -->
         <div class="w-full p-3.5 rounded-xl bg-black/75 border border-[#00f0ff]/50 shadow-[0_0_20px_rgba(0,240,255,0.35)] space-y-1.5">
           <p class="text-lg sm:text-xl font-black text-white leading-snug">
-            ได้โปรดดูที่จอบนหอประชุม
+            PLEASE LOOK AT THE MAIN STAGE SCREEN
           </p>
-          <p class="text-xs text-[#00ff66] font-medium">
-            เพื่อส่งพลังงานก้อนสุดท้ายพร้อมกันบนเวที
+          <p class="text-xs text-[#00ff66] font-medium font-mono-tech">
+            Awaiting presidential dual-touch for 100% finale
           </p>
         </div>
 
         <div class="text-[11px] font-mono-tech text-gray-300">
-          ✦ เมื่อพิธีเปิดเสร็จสิ้น สามารถกลับมากดเล่นต่อได้ ✦
+          ✦ You can resume tapping for fun after the opening ceremony ✦
         </div>
       </div>
     </div>
@@ -151,7 +151,7 @@
   <!-- BOTTOM HINT (MINIMAL) -->
   <footer class="w-full pb-4 text-center z-10">
     <div class="inline-block px-4 py-1 rounded-full bg-black/40 border border-[#00f0ff]/20 text-[11px] font-mono-tech text-gray-300">
-      ⚡ แตะที่ช้างรัวๆ เพื่อส่งพลังงาน ⚡
+      ⚡ RAPIDLY TAP ELEPHANT TO TRANSMIT ENERGY ⚡
     </div>
   </footer>
 
@@ -161,19 +161,19 @@
       <div class="text-4xl">🎮</div>
       <div>
         <h2 class="font-orbitron text-lg font-black text-[#ffe600] neon-glow-yellow">
-          ลงทะเบียนผู้ส่งพลังงาน
+          AGENT REGISTRATION
         </h2>
-        <p class="text-xs text-gray-300 mt-1">
-          กรอกชื่อเล่น ตามด้วย จ.ภ. เพื่อบันทึกคะแนนขึ้นจอใหญ่
+        <p class="text-xs text-gray-300 mt-1 font-mono-tech">
+          Enter your nickname & school to appear on the main screen leaderboard
         </p>
       </div>
       <div class="space-y-1.5 text-left">
-        <label class="text-[11px] text-[#00f0ff] font-mono-tech block">ชื่อของคุณ:</label>
-        <input id="inputPlayerName" type="text" maxlength="30" placeholder="เช่น ต้นน้ำ จ.ภ.พิษณุโลก" class="w-full bg-[#01082d] border border-[#00f0ff]/50 rounded-lg px-3.5 py-2.5 text-sm text-white placeholder-gray-500 focus:outline-none focus:border-[#ffe600] focus:ring-1 focus:ring-[#ffe600]">
-        <p class="text-[10px] text-gray-400">💡 ตัวอย่าง: บอส จ.ภ.ตรัง, นิว จ.ภ.มุกดาหาร</p>
+        <label class="text-[11px] text-[#00f0ff] font-mono-tech block">Agent Nickname:</label>
+        <input id="inputPlayerName" type="text" maxlength="30" placeholder="e.g. Alex PCSHS Phitsanulok" class="w-full bg-[#01082d] border border-[#00f0ff]/50 rounded-lg px-3.5 py-2.5 text-sm text-white placeholder-gray-500 focus:outline-none focus:border-[#ffe600] focus:ring-1 focus:ring-[#ffe600] font-mono-tech">
+        <p class="text-[10px] text-gray-400 font-mono-tech">💡 Example: Nick PCSHS Trang, Jane PCSHS Mukdahan</p>
       </div>
       <button id="btnSaveName" class="cyber-btn cyber-btn-yellow w-full py-2.5 text-sm font-bold font-orbitron">
-        🚀 ยืนยัน / เข้าสู่ห้องส่งพลังงาน
+        🚀 ENTER MISSION CONDUIT
       </button>
     </div>
   </div>
@@ -182,17 +182,15 @@
   <div id="standbyModal" class="fixed inset-0 z-40 flex flex-col items-center justify-center p-6 text-center bg-black/80 backdrop-blur-sm hidden">
     <div class="text-5xl mb-3 animate-pulse">⏳</div>
     <div class="font-orbitron text-xl font-bold text-[#ffe600] mb-2 neon-glow-yellow">
-      รอสัญญาณปล่อยตัวจากเวที...
+      WAITING FOR STAGE START SIGNAL...
     </div>
-    <p class="text-xs text-gray-300 max-w-xs mb-4">
-      ระบบเตรียมพร้อมแล้ว! เมื่อพิธีกรนับถอยหลัง ให้ช่วยกันรัวนิ้วส่งพลังงานทันที
+    <p class="text-xs text-gray-300 max-w-xs mb-4 font-mono-tech">
+      System ready! When the countdown ends, tap the screen rapidly to charge the conduit!
     </p>
     <div class="inline-block px-4 py-1.5 rounded-full bg-[#00f0ff]/10 border border-[#00f0ff]/30 text-xs font-mono-tech text-[#00f0ff]">
       STATUS: STANDBY MODE
     </div>
   </div>
-
-
 
   <!-- CELEBRATION MODAL ON GAME START -->
   <div id="gameStartModal" class="fixed inset-0 bg-[#010626]/95 z-50 flex flex-col items-center justify-center p-6 text-center hidden">
@@ -200,17 +198,17 @@
     <div class="font-orbitron text-3xl sm:text-4xl font-black text-[#ffe600] neon-glow-yellow mb-2">
       100% UNLOCKED!
     </div>
-    <p class="text-[#00f0ff] font-bold text-base mb-2">
-      พิธีเปิดสำเร็จเสร็จสิ้นสมบูรณ์!
+    <p class="text-[#00f0ff] font-bold text-base mb-2 font-orbitron">
+      OPENING CEREMONY OFFICIALLY UNLOCKED!
     </p>
     <div class="cyber-panel px-6 py-4 my-4">
-      <div class="text-xs text-gray-400">คุณมีส่วนร่วมส่งพลังไปทั้งหมด</div>
+      <div class="text-xs text-gray-400 font-mono-tech uppercase">Your Total Contribution</div>
       <div class="text-3xl font-orbitron font-bold text-[#00ff66] mt-1">
-        <span id="modalFinalClicks">0</span> ครั้ง!
+        <span id="modalFinalClicks">0</span> Taps!
       </div>
     </div>
-    <button onclick="document.getElementById('gameStartModal').classList.add('hidden')" class="cyber-btn text-xs py-1.5 px-4">
-      ปิดหน้านี้
+    <button onclick="document.getElementById('gameStartModal').classList.add('hidden')" class="cyber-btn text-xs py-1.5 px-4 font-orbitron">
+      Close
     </button>
   </div>
 

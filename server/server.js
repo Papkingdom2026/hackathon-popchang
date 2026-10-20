@@ -127,7 +127,7 @@ function calculateCPS() {
 function getTopPlayers() {
   const now = Date.now();
   return Array.from(players.values())
-    .filter(p => p.name && p.name !== 'ผู้เข้าร่วม' && (p.isOnline || (now - p.lastActive < 60000)))
+    .filter(p => p.name && p.name !== 'ผู้เข้าร่วม' && p.name !== 'Hacker Agent' && (p.isOnline || (now - p.lastActive < 60000)))
     .sort((a, b) => {
       if (b.clicks !== a.clicks) return b.clicks - a.clicks;
       return (b.lastActive || 0) - (a.lastActive || 0);
@@ -142,7 +142,7 @@ function getTopPlayers() {
 
 function getConnectedPlayers() {
   return Array.from(players.values())
-    .filter(p => p.name && p.name !== 'ผู้เข้าร่วม' && p.isOnline)
+    .filter(p => p.name && p.name !== 'ผู้เข้าร่วม' && p.name !== 'Hacker Agent' && p.isOnline)
     .slice(-40)
     .map(p => ({
       id: p.id,
@@ -276,7 +276,7 @@ io.on('connection', (socket) => {
     } else {
       player = {
         id: playerId,
-        name: rawName || 'ผู้เข้าร่วม',
+        name: rawName || 'Hacker Agent',
         clicks: 0,
         socketId: socket.id,
         isOnline: true,
@@ -311,7 +311,7 @@ io.on('connection', (socket) => {
     const rawPlayerName = (data?.playerName || '').trim().slice(0, 35);
     let player = players.get(playerId);
     if (!player) {
-      player = { id: playerId, name: rawPlayerName || 'ผู้เข้าร่วม', clicks: 0, socketId: socket.id, isOnline: true, lastActive: Date.now() };
+      player = { id: playerId, name: rawPlayerName || 'Hacker Agent', clicks: 0, socketId: socket.id, isOnline: true, lastActive: Date.now() };
       players.set(playerId, player);
     } else {
       if (rawPlayerName && player.name !== rawPlayerName) player.name = rawPlayerName;
@@ -322,7 +322,7 @@ io.on('connection', (socket) => {
     player.lastActive = Date.now();
 
     // Add to recent tappers queue for floating names background
-    if (player.name && player.name !== 'ผู้เข้าร่วม') {
+    if (player.name && player.name !== 'ผู้เข้าร่วม' && player.name !== 'Hacker Agent') {
       recentTappers.push({
         id: Math.random().toString(36).substring(2, 7),
         name: player.name,
